@@ -116,7 +116,11 @@
 		"didRead": "Rooはこのファイルを読みました:",
 		"wantsToEdit": "Rooはこのファイルを編集したい:",
 		"wantsToEditOutsideWorkspace": "Rooはワークスペース外のこのファイルを編集したい:",
-		"wantsToCreate": "Rooは新しいファイルを作成したい:"
+		"wantsToCreate": "Rooは新しいファイルを作成したい:",
+		"wantsToReadMultiple": "Rooはこれらの{{count}}個のファイルを読みたい：",
+		"didReadMultiple": "Rooはこれらの{{count}}個のファイルを読みました：",
+		"wantsToWriteMultiple": "Rooはこれらの{{count}}個のファイルに書き込みたい：",
+		"didWriteMultiple": "Rooはこれらの{{count}}個のファイルに書き込みました："
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Rooはこのディレクトリのトップレベルファイルを表示したい:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Rooはこのディレクトリで使用されているソースコード定義名を表示したい:",
 		"didViewDefinitions": "Rooはこのディレクトリで使用されているソースコード定義名を表示しました:",
 		"wantsToSearch": "Rooはこのディレクトリで <code>{{regex}}</code> を検索したい:",
-		"didSearch": "Rooはこのディレクトリで <code>{{regex}}</code> を検索しました:"
+		"didSearch": "Rooはこのディレクトリで <code>{{regex}}</code> を検索しました:",
+		"wantsToViewRecursiveMultiple": "Rooはこれらの{{count}}個のディレクトリ内のすべてのファイルを再帰的に表示したい：",
+		"wantsToViewTopLevelMultiple": "Rooはこれらの{{count}}個のディレクトリのトップレベルファイルを表示したい：",
+		"didViewRecursiveMultiple": "Rooはこれらの{{count}}個のディレクトリ内のすべてのファイルを再帰的に表示しました：",
+		"didViewTopLevelMultiple": "Rooはこれらの{{count}}個のディレクトリのトップレベルファイルを表示しました：",
+		"wantsToCreateMultiple": "Rooはこれらの{{count}}個のディレクトリを作成したい：",
+		"didCreateMultiple": "Rooはこれらの{{count}}個のディレクトリを作成しました：",
+		"wantsToDeleteMultiple": "Rooはこれらの{{count}}個のアイテムを削除したい：",
+		"didDeleteMultiple": "Rooはこれらの{{count}}個のアイテムを削除しました：",
+		"deleteWarning": "警告：これによりアイテムが完全に削除されます。"
 	},
 	"commandOutput": "コマンド出力",
 	"response": "応答",

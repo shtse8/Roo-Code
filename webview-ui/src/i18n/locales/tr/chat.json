@@ -116,7 +116,11 @@
 		"didRead": "Roo bu dosyayı okudu:",
 		"wantsToEdit": "Roo bu dosyayı düzenlemek istiyor:",
 		"wantsToEditOutsideWorkspace": "Roo çalışma alanı dışındaki bu dosyayı düzenlemek istiyor:",
-		"wantsToCreate": "Roo yeni bir dosya oluşturmak istiyor:"
+		"wantsToCreate": "Roo yeni bir dosya oluşturmak istiyor:",
+		"wantsToReadMultiple": "Roo bu {{count}} dosyayı okumak istiyor:",
+		"didReadMultiple": "Roo bu {{count}} dosyayı okudu:",
+		"wantsToWriteMultiple": "Roo bu {{count}} dosyaya yazmak istiyor:",
+		"didWriteMultiple": "Roo bu {{count}} dosyaya yazdı:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo bu dizindeki üst düzey dosyaları görüntülemek istiyor:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntülemek istiyor:",
 		"didViewDefinitions": "Roo bu dizinde kullanılan kaynak kod tanımlama isimlerini görüntüledi:",
 		"wantsToSearch": "Roo bu dizinde <code>{{regex}}</code> için arama yapmak istiyor:",
-		"didSearch": "Roo bu dizinde <code>{{regex}}</code> için arama yaptı:"
+		"didSearch": "Roo bu dizinde <code>{{regex}}</code> için arama yaptı:",
+		"wantsToViewRecursiveMultiple": "Roo bu {{count}} dizindeki tüm dosyaları özyinelemeli olarak görüntülemek istiyor:",
+		"wantsToViewTopLevelMultiple": "Roo bu {{count}} dizindeki üst düzey dosyaları görüntülemek istiyor:",
+		"didViewRecursiveMultiple": "Roo bu {{count}} dizindeki tüm dosyaları özyinelemeli olarak görüntüledi:",
+		"didViewTopLevelMultiple": "Roo bu {{count}} dizindeki üst düzey dosyaları görüntüledi:",
+		"wantsToCreateMultiple": "Roo bu {{count}} dizini oluşturmak istiyor:",
+		"didCreateMultiple": "Roo bu {{count}} dizini oluşturdu:",
+		"wantsToDeleteMultiple": "Roo bu {{count}} öğeyi silmek istiyor:",
+		"didDeleteMultiple": "Roo bu {{count}} öğeyi sildi:",
+		"deleteWarning": "Uyarı: Bu işlem öğeleri kalıcı olarak silecektir."
 	},
 	"commandOutput": "Komut Çıktısı",
 	"response": "Yanıt",

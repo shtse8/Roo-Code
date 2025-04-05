@@ -116,7 +116,11 @@
 		"didRead": "Roo 已讀取此檔案：",
 		"wantsToEdit": "Roo 想要編輯此檔案：",
 		"wantsToEditOutsideWorkspace": "Roo 想要編輯此工作區外的檔案：",
-		"wantsToCreate": "Roo 想要建立新檔案："
+		"wantsToCreate": "Roo 想要建立新檔案：",
+		"wantsToReadMultiple": "Roo 想要讀取這 {{count}} 個檔案：",
+		"didReadMultiple": "Roo 已讀取這 {{count}} 個檔案：",
+		"wantsToWriteMultiple": "Roo 想要寫入這 {{count}} 個檔案：",
+		"didWriteMultiple": "Roo 已寫入這 {{count}} 個檔案："
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo 想要檢視此目錄中最上層的檔案：",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo 想要檢視此目錄中使用的原始碼定義名稱：",
 		"didViewDefinitions": "Roo 已檢視此目錄中使用的原始碼定義名稱：",
 		"wantsToSearch": "Roo 想要在此目錄中搜尋 <code>{{regex}}</code>：",
-		"didSearch": "Roo 已在此目錄中搜尋 <code>{{regex}}</code>："
+		"didSearch": "Roo 已在此目錄中搜尋 <code>{{regex}}</code>：",
+		"wantsToViewRecursiveMultiple": "Roo 想要遞迴檢視這 {{count}} 個目錄中的所有檔案：",
+		"wantsToViewTopLevelMultiple": "Roo 想要檢視這 {{count}} 個目錄中的頂層檔案：",
+		"didViewRecursiveMultiple": "Roo 已遞迴檢視這 {{count}} 個目錄中的所有檔案：",
+		"didViewTopLevelMultiple": "Roo 已檢視這 {{count}} 個目錄中的頂層檔案：",
+		"wantsToCreateMultiple": "Roo 想要建立這 {{count}} 個目錄：",
+		"didCreateMultiple": "Roo 已建立這 {{count}} 個目錄：",
+		"wantsToDeleteMultiple": "Roo 想要刪除這 {{count}} 個項目：",
+		"didDeleteMultiple": "Roo 已刪除這 {{count}} 個項目：",
+		"deleteWarning": "警告：這將會永久刪除項目。"
 	},
 	"commandOutput": "命令輸出",
 	"response": "回應",

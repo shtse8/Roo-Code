@@ -116,7 +116,11 @@
 		"didRead": "Roo leyó este archivo:",
 		"wantsToEdit": "Roo quiere editar este archivo:",
 		"wantsToEditOutsideWorkspace": "Roo quiere editar este archivo fuera del espacio de trabajo:",
-		"wantsToCreate": "Roo quiere crear un nuevo archivo:"
+		"wantsToCreate": "Roo quiere crear un nuevo archivo:",
+		"wantsToReadMultiple": "Roo quiere leer estos {{count}} archivos:",
+		"didReadMultiple": "Roo leyó estos {{count}} archivos:",
+		"wantsToWriteMultiple": "Roo quiere escribir en estos {{count}} archivos:",
+		"didWriteMultiple": "Roo escribió en estos {{count}} archivos:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo quiere ver los archivos de nivel superior en este directorio:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo quiere ver nombres de definiciones de código fuente utilizados en este directorio:",
 		"didViewDefinitions": "Roo vio nombres de definiciones de código fuente utilizados en este directorio:",
 		"wantsToSearch": "Roo quiere buscar en este directorio <code>{{regex}}</code>:",
-		"didSearch": "Roo buscó en este directorio <code>{{regex}}</code>:"
+		"didSearch": "Roo buscó en este directorio <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo quiere ver recursivamente todos los archivos en estos {{count}} directorios:",
+		"wantsToViewTopLevelMultiple": "Roo quiere ver los archivos de nivel superior en estos {{count}} directorios:",
+		"didViewRecursiveMultiple": "Roo vio recursivamente todos los archivos en estos {{count}} directorios:",
+		"didViewTopLevelMultiple": "Roo vio los archivos de nivel superior en estos {{count}} directorios:",
+		"wantsToCreateMultiple": "Roo quiere crear estos {{count}} directorios:",
+		"didCreateMultiple": "Roo creó estos {{count}} directorios:",
+		"wantsToDeleteMultiple": "Roo quiere eliminar estos {{count}} elementos:",
+		"didDeleteMultiple": "Roo eliminó estos {{count}} elementos:",
+		"deleteWarning": "Advertencia: Esto eliminará permanentemente los elementos."
 	},
 	"commandOutput": "Salida del comando",
 	"response": "Respuesta",

@@ -114,7 +114,11 @@
 		"didRead": "Roo read this file:",
 		"wantsToEdit": "Roo wants to edit this file:",
 		"wantsToEditOutsideWorkspace": "Roo wants to edit this file outside of the workspace:",
-		"wantsToCreate": "Roo wants to create a new file:"
+		"wantsToCreate": "Roo wants to create a new file:",
+		"wantsToReadMultiple": "Roo wants to read these {{count}} files:",
+		"didReadMultiple": "Roo read these {{count}} files:",
+		"wantsToWriteMultiple": "Roo wants to write these {{count}} files:",
+		"didWriteMultiple": "Roo wrote these {{count}} files:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo wants to view the top level files in this directory:",
@@ -124,7 +128,16 @@
 		"wantsToViewDefinitions": "Roo wants to view source code definition names used in this directory:",
 		"didViewDefinitions": "Roo viewed source code definition names used in this directory:",
 		"wantsToSearch": "Roo wants to search this directory for <code>{{regex}}</code>:",
-		"didSearch": "Roo searched this directory for <code>{{regex}}</code>:"
+		"didSearch": "Roo searched this directory for <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo wants to recursively view all files in these {{count}} directories:",
+		"wantsToViewTopLevelMultiple": "Roo wants to view the top level files in these {{count}} directories:",
+		"didViewRecursiveMultiple": "Roo recursively viewed all files in these {{count}} directories:",
+		"didViewTopLevelMultiple": "Roo viewed the top level files in these {{count}} directories:",
+		"wantsToCreateMultiple": "Roo wants to create these {{count}} directories:",
+		"didCreateMultiple": "Roo created these {{count}} directories:",
+		"wantsToDeleteMultiple": "Roo wants to delete these {{count}} items:",
+		"didDeleteMultiple": "Roo deleted these {{count}} items:",
+		"deleteWarning": "Warning: This will permanently delete items."
 	},
 	"commandOutput": "Command Output",
 	"response": "Response",

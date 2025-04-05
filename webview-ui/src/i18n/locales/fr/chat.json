@@ -113,7 +113,11 @@
 		"didRead": "Roo a lu ce fichier :",
 		"wantsToEdit": "Roo veut éditer ce fichier :",
 		"wantsToEditOutsideWorkspace": "Roo veut éditer ce fichier en dehors de l'espace de travail :",
-		"wantsToCreate": "Roo veut créer un nouveau fichier :"
+		"wantsToCreate": "Roo veut créer un nouveau fichier :",
+		"wantsToReadMultiple": "Roo veut lire ces {{count}} fichiers :",
+		"didReadMultiple": "Roo a lu ces {{count}} fichiers :",
+		"wantsToWriteMultiple": "Roo veut écrire dans ces {{count}} fichiers :",
+		"didWriteMultiple": "Roo a écrit dans ces {{count}} fichiers :"
 	},
 	"instructions": {
 		"wantsToFetch": "Roo veut récupérer des instructions détaillées pour aider à la tâche actuelle"
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo veut voir les noms de définitions de code source utilisés dans ce répertoire :",
 		"didViewDefinitions": "Roo a vu les noms de définitions de code source utilisés dans ce répertoire :",
 		"wantsToSearch": "Roo veut rechercher dans ce répertoire <code>{{regex}}</code> :",
-		"didSearch": "Roo a recherché dans ce répertoire <code>{{regex}}</code> :"
+		"didSearch": "Roo a recherché dans ce répertoire <code>{{regex}}</code> :",
+		"wantsToViewRecursiveMultiple": "Roo veut voir récursivement tous les fichiers dans ces {{count}} répertoires :",
+		"wantsToViewTopLevelMultiple": "Roo veut voir les fichiers de premier niveau dans ces {{count}} répertoires :",
+		"didViewRecursiveMultiple": "Roo a vu récursivement tous les fichiers dans ces {{count}} répertoires :",
+		"didViewTopLevelMultiple": "Roo a vu les fichiers de premier niveau dans ces {{count}} répertoires :",
+		"wantsToCreateMultiple": "Roo veut créer ces {{count}} répertoires :",
+		"didCreateMultiple": "Roo a créé ces {{count}} répertoires :",
+		"wantsToDeleteMultiple": "Roo veut supprimer ces {{count}} éléments :",
+		"didDeleteMultiple": "Roo a supprimé ces {{count}} éléments :",
+		"deleteWarning": "Attention : Cela supprimera définitivement les éléments."
 	},
 	"commandOutput": "Sortie de commande",
 	"response": "Réponse",

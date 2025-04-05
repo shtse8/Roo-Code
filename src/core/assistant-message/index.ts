@@ -11,14 +11,19 @@ export interface TextContent {
 export const toolUseNames = [
 	"execute_command",
 	"read_file",
+	"read_files", // Add new batch tool name
 	"write_to_file",
+	"write_files", // Add new batch tool name
 	"apply_diff",
 	"insert_content",
 	"search_and_replace",
 	"search_files",
 	"list_files",
+	"list_directories", // Add new batch tool name
 	"list_code_definition_names",
+	"create_directories", // Add new tool name
 	"browser_action",
+	"delete_items", // Add new tool name
 	"use_mcp_tool",
 	"access_mcp_resource",
 	"ask_followup_question",
@@ -34,7 +39,9 @@ export type ToolUseName = (typeof toolUseNames)[number]
 export const toolParamNames = [
 	"command",
 	"path",
+	"paths", // Ensure 'paths' parameter name exists
 	"content",
+	"items", // Ensure 'items' parameter name exists
 	"line_count",
 	"regex",
 	"file_pattern",
@@ -68,7 +75,8 @@ export interface ToolUse {
 	type: "tool_use"
 	name: ToolUseName
 	// params is a partial record, allowing only some or none of the possible parameters to be used
-	params: Partial<Record<ToolParamName, string>>
+	// Allow params to hold various types (string, string[], etc.), rely on specific tool interfaces for stricter typing.
+	params: Partial<Record<ToolParamName, any>>
 	partial: boolean
 }
 
@@ -83,6 +91,16 @@ export interface ReadFileToolUse extends ToolUse {
 	params: Partial<Pick<Record<ToolParamName, string>, "path" | "start_line" | "end_line">>
 }
 
+// Define the interface for the new batch read tool
+export interface ReadFilesToolUse extends ToolUse {
+	name: "read_files"
+	params: {
+		paths: string[] // Required array of strings
+		start_line?: string
+		end_line?: string
+	}
+}
+
 export interface FetchInstructionsToolUse extends ToolUse {
 	name: "fetch_instructions"
 	params: Partial<Pick<Record<ToolParamName, string>, "task">>
@@ -91,6 +109,35 @@ export interface FetchInstructionsToolUse extends ToolUse {
 export interface WriteToFileToolUse extends ToolUse {
 	name: "write_to_file"
 	params: Partial<Pick<Record<ToolParamName, string>, "path" | "content" | "line_count">>
+}
+
+// Define WriteItem structure again or import if shared
+interface WriteItem {
+	path: string
+	content: string
+}
+// Define the interface for the new batch write tool
+export interface WriteFilesToolUse extends ToolUse {
+	name: "write_files"
+	params: {
+		items: WriteItem[] // Required array of {path, content}
+	}
+}
+
+// Define the interface for the new batch delete items tool
+export interface DeleteItemsToolUse extends ToolUse {
+	name: "delete_items"
+	params: {
+		paths: string[] // Required array of strings
+	}
+}
+
+// Define the interface for the new batch create directories tool
+export interface CreateDirectoriesToolUse extends ToolUse {
+	name: "create_directories"
+	params: {
+		paths: string[] // Required array of strings
+	}
 }
 
 export interface InsertCodeBlockToolUse extends ToolUse {
@@ -106,6 +153,15 @@ export interface SearchFilesToolUse extends ToolUse {
 export interface ListFilesToolUse extends ToolUse {
 	name: "list_files"
 	params: Partial<Pick<Record<ToolParamName, string>, "path" | "recursive">>
+}
+
+// Define the interface for the new batch list tool
+export interface ListDirectoriesToolUse extends ToolUse {
+	name: "list_directories"
+	params: {
+		paths: string[] // Required array of strings
+		recursive?: string // Optional boolean as string
+	}
 }
 
 export interface ListCodeDefinitionNamesToolUse extends ToolUse {

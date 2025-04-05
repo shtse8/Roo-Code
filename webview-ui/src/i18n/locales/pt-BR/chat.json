@@ -116,7 +116,11 @@
 		"didRead": "Roo leu este arquivo:",
 		"wantsToEdit": "Roo quer editar este arquivo:",
 		"wantsToEditOutsideWorkspace": "Roo quer editar este arquivo fora do espaço de trabalho:",
-		"wantsToCreate": "Roo quer criar um novo arquivo:"
+		"wantsToCreate": "Roo quer criar um novo arquivo:",
+		"wantsToReadMultiple": "Roo quer ler estes {{count}} arquivos:",
+		"didReadMultiple": "Roo leu estes {{count}} arquivos:",
+		"wantsToWriteMultiple": "Roo quer escrever nestes {{count}} arquivos:",
+		"didWriteMultiple": "Roo escreveu nestes {{count}} arquivos:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo quer visualizar os arquivos de nível superior neste diretório:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo quer visualizar nomes de definição de código-fonte usados neste diretório:",
 		"didViewDefinitions": "Roo visualizou nomes de definição de código-fonte usados neste diretório:",
 		"wantsToSearch": "Roo quer pesquisar neste diretório por <code>{{regex}}</code>:",
-		"didSearch": "Roo pesquisou neste diretório por <code>{{regex}}</code>:"
+		"didSearch": "Roo pesquisou neste diretório por <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo quer visualizar recursivamente todos os arquivos nestes {{count}} diretórios:",
+		"wantsToViewTopLevelMultiple": "Roo quer visualizar os arquivos de nível superior nestes {{count}} diretórios:",
+		"didViewRecursiveMultiple": "Roo visualizou recursivamente todos os arquivos nestes {{count}} diretórios:",
+		"didViewTopLevelMultiple": "Roo visualizou os arquivos de nível superior nestes {{count}} diretórios:",
+		"wantsToCreateMultiple": "Roo quer criar estes {{count}} diretórios:",
+		"didCreateMultiple": "Roo criou estes {{count}} diretórios:",
+		"wantsToDeleteMultiple": "Roo quer excluir estes {{count}} itens:",
+		"didDeleteMultiple": "Roo excluiu estes {{count}} itens:",
+		"deleteWarning": "Aviso: Isso excluirá permanentemente os itens."
 	},
 	"commandOutput": "Saída do comando",
 	"response": "Resposta",

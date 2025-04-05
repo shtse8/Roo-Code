@@ -116,7 +116,11 @@
 		"didRead": "Roo ने इस फ़ाइल को पढ़ा:",
 		"wantsToEdit": "Roo इस फ़ाइल को संपादित करना चाहता है:",
 		"wantsToEditOutsideWorkspace": "Roo कार्यक्षेत्र के बाहर इस फ़ाइल को संपादित करना चाहता है:",
-		"wantsToCreate": "Roo एक नई फ़ाइल बनाना चाहता है:"
+		"wantsToCreate": "Roo एक नई फ़ाइल बनाना चाहता है:",
+		"wantsToReadMultiple": "Roo इन {{count}} फ़ाइलों को पढ़ना चाहता है:",
+		"didReadMultiple": "Roo ने इन {{count}} फ़ाइलों को पढ़ा:",
+		"wantsToWriteMultiple": "Roo इन {{count}} फ़ाइलों में लिखना चाहता है:",
+		"didWriteMultiple": "Roo ने इन {{count}} फ़ाइलों में लिखा:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo इस निर्देशिका में शीर्ष स्तर की फ़ाइलें देखना चाहता है:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo इस निर्देशिका में उपयोग किए गए सोर्स कोड परिभाषा नामों को देखना चाहता है:",
 		"didViewDefinitions": "Roo ने इस निर्देशिका में उपयोग किए गए सोर्स कोड परिभाषा नामों को देखा:",
 		"wantsToSearch": "Roo इस निर्देशिका में <code>{{regex}}</code> के लिए खोज करना चाहता है:",
-		"didSearch": "Roo ने इस निर्देशिका में <code>{{regex}}</code> के लिए खोज की:"
+		"didSearch": "Roo ने इस निर्देशिका में <code>{{regex}}</code> के लिए खोज की:",
+		"wantsToViewRecursiveMultiple": "Roo इन {{count}} निर्देशिकाओं में सभी फ़ाइलों को पुनरावर्ती रूप से देखना चाहता है:",
+		"wantsToViewTopLevelMultiple": "Roo इन {{count}} निर्देशिकाओं में शीर्ष स्तर की फ़ाइलें देखना चाहता है:",
+		"didViewRecursiveMultiple": "Roo ने इन {{count}} निर्देशिकाओं में सभी फ़ाइलों को पुनरावर्ती रूप से देखा:",
+		"didViewTopLevelMultiple": "Roo ने इन {{count}} निर्देशिकाओं में शीर्ष स्तर की फ़ाइलें देखीं:",
+		"wantsToCreateMultiple": "Roo इन {{count}} निर्देशिकाओं को बनाना चाहता है:",
+		"didCreateMultiple": "Roo ने इन {{count}} निर्देशिकाओं को बनाया:",
+		"wantsToDeleteMultiple": "Roo इन {{count}} आइटमों को हटाना चाहता है:",
+		"didDeleteMultiple": "Roo ने इन {{count}} आइटमों को हटाया:",
+		"deleteWarning": "चेतावनी: यह आइटमों को स्थायी रूप से हटा देगा।"
 	},
 	"commandOutput": "कमांड आउटपुट",
 	"response": "प्रतिक्रिया",

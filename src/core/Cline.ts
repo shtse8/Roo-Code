@@ -5,6 +5,7 @@ import crypto from "crypto"
 import EventEmitter from "events"
 
 import { Anthropic } from "@anthropic-ai/sdk"
+// Remove problematic type import, rely on qualified names like Anthropic.Messages.*
 import cloneDeep from "clone-deep"
 import delay from "delay"
 import pWaitFor from "p-wait-for"
@@ -25,6 +26,7 @@ import { findToolName, formatContentBlockToMarkdown } from "../integrations/misc
 import { fetchInstructionsTool } from "./tools/fetchInstructionsTool"
 import { listFilesTool } from "./tools/listFilesTool"
 import { readFileTool } from "./tools/readFileTool"
+import { readFilesTool } from "./tools/readFilesTool" // Add import
 import { ExitCodeDetails } from "../integrations/terminal/TerminalProcess"
 import { Terminal } from "../integrations/terminal/Terminal"
 import { TerminalRegistry } from "../integrations/terminal/TerminalRegistry"
@@ -67,10 +69,14 @@ import { telemetryService } from "../services/telemetry/TelemetryService"
 import { validateToolUse, isToolAllowedForMode, ToolName } from "./mode-validator"
 import { getWorkspacePath } from "../utils/path"
 import { writeToFileTool } from "./tools/writeToFileTool"
+import { writeFilesTool } from "./tools/writeFilesTool" // Add import
 import { applyDiffTool } from "./tools/applyDiffTool"
 import { insertContentTool } from "./tools/insertContentTool"
 import { searchAndReplaceTool } from "./tools/searchAndReplaceTool"
 import { listCodeDefinitionNamesTool } from "./tools/listCodeDefinitionNamesTool"
+import { listDirectoriesTool } from "./tools/listDirectoriesTool" // Add import
+import { createDirectoriesTool } from "./tools/createDirectoriesTool" // Add import
+import { deleteItemsTool } from "./tools/deleteItemsTool" // Add import
 import { searchFilesTool } from "./tools/searchFilesTool"
 import { browserActionTool } from "./tools/browserActionTool"
 import { executeCommandTool } from "./tools/executeCommandTool"
@@ -706,8 +712,10 @@ export class Cline extends EventEmitter<ClineEvents> {
 		// v2.0 xml tags refactor caveat: since we don't use tools anymore, we need to replace all tool use blocks with a text block since the API disallows conversations with tool uses and no tool schema
 		const conversationWithoutToolBlocks = existingApiConversationHistory.map((message) => {
 			if (Array.isArray(message.content)) {
-				const newContent = message.content.map((block) => {
+				// Use ContentBlockParam for mapping input/parameter-like structures
+				const newContent = message.content.map((block: Anthropic.Messages.ContentBlockParam) => {
 					if (block.type === "tool_use") {
+						// This comparison might still be problematic if block is Param type
 						// it's important we convert to the new tool schema format so the model doesn't get confused about how to invoke tools
 						const inputAsXml = Object.entries(block.input as Record<string, string>)
 							.map(([key, value]) => `<${key}>\n${value}\n</${key}>`)
@@ -717,20 +725,44 @@ export class Cline extends EventEmitter<ClineEvents> {
 							text: `<${block.name}>\n${inputAsXml}\n</${block.name}>`,
 						} as Anthropic.Messages.TextBlockParam
 					} else if (block.type === "tool_result") {
-						// Convert block.content to text block array, removing images
-						const contentAsTextBlocks = Array.isArray(block.content)
-							? block.content.filter((item) => item.type === "text")
-							: [{ type: "text", text: block.content }]
+						// block here is ToolResultBlockParam
+						const toolResultBlock = block as Anthropic.Messages.ToolResultBlockParam // Assert type for clarity within this block
+
+						// Convert toolResultBlock.content (which is string | (TextBlockParam | ImageBlockParam)[]) to text block array, removing images
+						let contentAsTextBlocks: Anthropic.Messages.TextBlockParam[]
+						if (Array.isArray(toolResultBlock.content)) {
+							// Filter out non-text blocks from the array
+							contentAsTextBlocks = toolResultBlock.content.filter(
+								(
+									item: Anthropic.Messages.TextBlockParam | Anthropic.Messages.ImageBlockParam,
+								): item is Anthropic.Messages.TextBlockParam => item.type === "text",
+							)
+						} else if (typeof toolResultBlock.content === "string") {
+							// If content is just a string, wrap it in a TextBlockParam structure
+							contentAsTextBlocks = [{ type: "text", text: toolResultBlock.content }]
+						} else {
+							// Handle cases where content might be undefined or unexpected type
+							console.warn("Unexpected tool_result content type:", toolResultBlock.content)
+							contentAsTextBlocks = []
+						}
+
 						const textContent = contentAsTextBlocks.map((item) => item.text).join("\n\n")
-						const toolName = findToolName(block.tool_use_id, existingApiConversationHistory)
+						const toolName = findToolName(toolResultBlock.tool_use_id, existingApiConversationHistory) // Use the asserted block
 						return {
 							type: "text",
 							text: `[${toolName} Result]\n\n${textContent}`,
-						} as Anthropic.Messages.TextBlockParam
+						} as Anthropic.Messages.TextBlockParam // Return as TextBlockParam
 					}
+					// If block is not tool_use or tool_result, return it (it should be TextBlockParam or ImageBlockParam)
 					return block
 				})
-				return { ...message, content: newContent }
+				// Ensure the final mapped content array has the correct type
+				const typedNewContent = newContent as (
+					| Anthropic.Messages.TextBlockParam
+					| Anthropic.Messages.ImageBlockParam
+					| Anthropic.Messages.ToolUseBlockParam
+				)[]
+				return { ...message, content: typedNewContent }
 			}
 			return message
 		})
@@ -753,12 +785,13 @@ export class Cline extends EventEmitter<ClineEvents> {
 				const content = Array.isArray(lastMessage.content)
 					? lastMessage.content
 					: [{ type: "text", text: lastMessage.content }]
-				const hasToolUse = content.some((block) => block.type === "tool_use")
+				const hasToolUse = content.some((block: any) => block.type === "tool_use") // Use any temporarily
 
 				if (hasToolUse) {
+					// Use Param type for filtering, then assert/guard if needed, or handle potential type differences
 					const toolUseBlocks = content.filter(
-						(block) => block.type === "tool_use",
-					) as Anthropic.Messages.ToolUseBlock[]
+						(block: any): block is Anthropic.Messages.ToolUseBlock => block.type === "tool_use", // Use any temporarily
+					)
 					const toolResponses: Anthropic.ToolResultBlockParam[] = toolUseBlocks.map((block) => ({
 						type: "tool_result",
 						tool_use_id: block.id,
@@ -782,24 +815,32 @@ export class Cline extends EventEmitter<ClineEvents> {
 						? previousAssistantMessage.content
 						: [{ type: "text", text: previousAssistantMessage.content }]
 
+					// Use Param type for filtering
 					const toolUseBlocks = assistantContent.filter(
-						(block) => block.type === "tool_use",
-					) as Anthropic.Messages.ToolUseBlock[]
+						(block: any): block is Anthropic.Messages.ToolUseBlock => block.type === "tool_use", // Use any temporarily
+					)
 
 					if (toolUseBlocks.length > 0) {
+						// Use Param type for filtering, change target type to ToolResultBlockParam
 						const existingToolResults = existingUserContent.filter(
-							(block) => block.type === "tool_result",
-						) as Anthropic.ToolResultBlockParam[]
+							(block: any): block is Anthropic.Messages.ToolResultBlockParam =>
+								block.type === "tool_result", // Use any temporarily
+						)
 
-						const missingToolResponses: Anthropic.ToolResultBlockParam[] = toolUseBlocks
+						// Ensure types match here: toolUse is ToolUseBlock, result is ToolResultBlockParam
+						const missingToolResponses: Anthropic.Messages.ToolResultBlockParam[] = toolUseBlocks
 							.filter(
-								(toolUse) => !existingToolResults.some((result) => result.tool_use_id === toolUse.id),
+								(toolUse: Anthropic.Messages.ToolUseBlock) =>
+									!existingToolResults.some(
+										(result: Anthropic.Messages.ToolResultBlockParam) =>
+											result.tool_use_id === toolUse.id,
+									),
 							)
-							.map((toolUse) => ({
+							.map((toolUse: Anthropic.Messages.ToolUseBlock) => ({
 								type: "tool_result",
 								tool_use_id: toolUse.id,
 								content: "Task was interrupted before this tool call could be completed.",
-							}))
+							})) // Type for map lambda already specified
 
 						modifiedApiConversationHistory = existingApiConversationHistory.slice(0, -1) // removes the last user message
 						modifiedOldUserContent = [...existingUserContent, ...missingToolResponses]
@@ -1375,9 +1416,11 @@ export class Cline extends EventEmitter<ClineEvents> {
 					switch (block.name) {
 						case "execute_command":
 							return `[${block.name} for '${block.params.command}']`
-						case "read_file":
+						case "read_file": // Existing cases...
+						case "read_files": // Add case for new tool
 							return `[${block.name} for '${block.params.path}']`
-						case "fetch_instructions":
+						case "fetch_instructions": // Existing cases...
+						case "write_files": // Add case for new tool
 							return `[${block.name} for '${block.params.task}']`
 						case "write_to_file":
 							return `[${block.name} for '${block.params.path}']`
@@ -1391,7 +1434,8 @@ export class Cline extends EventEmitter<ClineEvents> {
 							return `[${block.name} for '${block.params.path}']`
 						case "search_and_replace":
 							return `[${block.name} for '${block.params.path}']`
-						case "list_files":
+						case "list_files": // Existing cases...
+						case "list_directories": // Add case for new tool
 							return `[${block.name} for '${block.params.path}']`
 						case "list_code_definition_names":
 							return `[${block.name} for '${block.params.path}']`
@@ -1413,6 +1457,19 @@ export class Cline extends EventEmitter<ClineEvents> {
 							const modeName = getModeBySlug(mode, customModes)?.name ?? mode
 							return `[${block.name} in ${modeName} mode: '${message}']`
 						}
+						case "create_directories": // Add case for new tool
+							// Safely access length, provide default if paths is undefined/null
+							return `[${block.name} for ${block.params.paths?.length ?? 0} director(y/ies)]`
+						case "delete_items": // Add case for new tool
+							// Safely access length, provide default if paths is undefined/null
+							return `[${block.name} for ${block.params.paths?.length ?? 0} item(s)]`
+						default: // Add default case
+							// Attempt to return a generic description or handle unknown tools
+							const toolName = block.name || "unknown_tool"
+							// Safely stringify params, handle potential undefined
+							const paramsDesc = block.params ? ` with params: ${JSON.stringify(block.params)}` : ""
+							console.warn(`Unhandled tool in toolDescription: ${toolName}`)
+							return `[${toolName}${paramsDesc}]`
 					}
 				}
 
@@ -1586,11 +1643,27 @@ export class Cline extends EventEmitter<ClineEvents> {
 					case "read_file":
 						await readFileTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
 						break
+					case "read_files": // Add case for new tool
+						await readFilesTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
+						break
 					case "fetch_instructions":
 						await fetchInstructionsTool(this, block, askApproval, handleError, pushToolResult)
 						break
+					case "write_files": // Add case for new tool
+						await writeFilesTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
+						break
 					case "list_files":
 						await listFilesTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
+						break
+					case "list_directories": // Add case for new tool
+						await listDirectoriesTool(
+							this,
+							block,
+							askApproval,
+							handleError,
+							pushToolResult,
+							removeClosingTag,
+						)
 						break
 					case "list_code_definition_names":
 						await listCodeDefinitionNamesTool(
@@ -1604,6 +1677,19 @@ export class Cline extends EventEmitter<ClineEvents> {
 						break
 					case "search_files":
 						await searchFilesTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
+						break
+					case "create_directories": // Add case for new tool
+						await createDirectoriesTool(
+							this,
+							block,
+							askApproval,
+							handleError,
+							pushToolResult,
+							removeClosingTag,
+						)
+						break
+					case "delete_items": // Add case for new tool
+						await deleteItemsTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
 						break
 					case "browser_action":
 						await browserActionTool(this, block, askApproval, handleError, pushToolResult, removeClosingTag)
@@ -2077,19 +2163,26 @@ export class Cline extends EventEmitter<ClineEvents> {
 							return block
 						} else if (Array.isArray(block.content)) {
 							const parsedContent = await Promise.all(
-								block.content.map(async (contentBlock) => {
-									if (contentBlock.type === "text" && shouldProcessMentions(contentBlock.text)) {
-										return {
-											...contentBlock,
-											text: await parseMentions(
-												contentBlock.text,
-												this.cwd,
-												this.urlContentFetcher,
-											),
+								block.content.map(
+									async (
+										contentBlock:
+											| Anthropic.Messages.TextBlockParam
+											| Anthropic.Messages.ImageBlockParam,
+									) => {
+										// Use Param types
+										if (contentBlock.type === "text" && shouldProcessMentions(contentBlock.text)) {
+											return {
+												...contentBlock,
+												text: await parseMentions(
+													contentBlock.text,
+													this.cwd,
+													this.urlContentFetcher,
+												),
+											}
 										}
-									}
-									return contentBlock
-								}),
+										return contentBlock
+									},
+								),
 							)
 							return {
 								...block,

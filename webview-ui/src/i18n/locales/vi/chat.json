@@ -116,7 +116,11 @@
 		"didRead": "Roo đã đọc tệp này:",
 		"wantsToEdit": "Roo muốn chỉnh sửa tệp này:",
 		"wantsToEditOutsideWorkspace": "Roo muốn chỉnh sửa tệp này bên ngoài không gian làm việc:",
-		"wantsToCreate": "Roo muốn tạo một tệp mới:"
+		"wantsToCreate": "Roo muốn tạo một tệp mới:",
+		"wantsToReadMultiple": "Roo muốn đọc {{count}} tệp này:",
+		"didReadMultiple": "Roo đã đọc {{count}} tệp này:",
+		"wantsToWriteMultiple": "Roo muốn ghi vào {{count}} tệp này:",
+		"didWriteMultiple": "Roo đã ghi vào {{count}} tệp này:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo muốn xem các tệp cấp cao nhất trong thư mục này:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo muốn xem tên định nghĩa mã nguồn được sử dụng trong thư mục này:",
 		"didViewDefinitions": "Roo đã xem tên định nghĩa mã nguồn được sử dụng trong thư mục này:",
 		"wantsToSearch": "Roo muốn tìm kiếm trong thư mục này cho <code>{{regex}}</code>:",
-		"didSearch": "Roo đã tìm kiếm trong thư mục này cho <code>{{regex}}</code>:"
+		"didSearch": "Roo đã tìm kiếm trong thư mục này cho <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo muốn xem đệ quy tất cả các tệp trong {{count}} thư mục này:",
+		"wantsToViewTopLevelMultiple": "Roo muốn xem các tệp cấp cao nhất trong {{count}} thư mục này:",
+		"didViewRecursiveMultiple": "Roo đã xem đệ quy tất cả các tệp trong {{count}} thư mục này:",
+		"didViewTopLevelMultiple": "Roo đã xem các tệp cấp cao nhất trong {{count}} thư mục này:",
+		"wantsToCreateMultiple": "Roo muốn tạo {{count}} thư mục này:",
+		"didCreateMultiple": "Roo đã tạo {{count}} thư mục này:",
+		"wantsToDeleteMultiple": "Roo muốn xóa {{count}} mục này:",
+		"didDeleteMultiple": "Roo đã xóa {{count}} mục này:",
+		"deleteWarning": "Cảnh báo: Thao tác này sẽ xóa vĩnh viễn các mục."
 	},
 	"commandOutput": "Kết quả lệnh",
 	"response": "Phản hồi",

@@ -116,7 +116,11 @@
 		"didRead": "已读取文件:",
 		"wantsToEdit": "需要编辑文件:",
 		"wantsToEditOutsideWorkspace": "需要编辑外部文件:",
-		"wantsToCreate": "需要新建文件:"
+		"wantsToCreate": "需要新建文件:",
+		"wantsToReadMultiple": "需要读取 {{count}} 个文件：",
+		"didReadMultiple": "已读取 {{count}} 个文件：",
+		"wantsToWriteMultiple": "需要写入 {{count}} 个文件：",
+		"didWriteMultiple": "已写入 {{count}} 个文件："
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "需要查看目录文件列表:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo想查看此目录中使用的源代码定义名称:",
 		"didViewDefinitions": "Roo已查看此目录中使用的源代码定义名称:",
 		"wantsToSearch": "需要搜索内容: {{regex}}",
-		"didSearch": "已完成内容搜索: {{regex}}"
+		"didSearch": "已完成内容搜索: {{regex}}",
+		"wantsToViewRecursiveMultiple": "需要递归查看 {{count}} 个目录中的所有文件：",
+		"wantsToViewTopLevelMultiple": "需要查看 {{count}} 个目录中的顶层文件：",
+		"didViewRecursiveMultiple": "已递归查看 {{count}} 个目录中的所有文件：",
+		"didViewTopLevelMultiple": "已查看 {{count}} 个目录中的顶层文件：",
+		"wantsToCreateMultiple": "需要创建 {{count}} 个目录：",
+		"didCreateMultiple": "已创建 {{count}} 个目录：",
+		"wantsToDeleteMultiple": "需要删除 {{count}} 个项目：",
+		"didDeleteMultiple": "已删除 {{count}} 个项目：",
+		"deleteWarning": "警告：这将永久删除项目。"
 	},
 	"commandOutput": "命令输出",
 	"response": "响应",

@@ -116,7 +116,11 @@
 		"didRead": "Roo ha letto questo file:",
 		"wantsToEdit": "Roo vuole modificare questo file:",
 		"wantsToEditOutsideWorkspace": "Roo vuole modificare questo file al di fuori dell'area di lavoro:",
-		"wantsToCreate": "Roo vuole creare un nuovo file:"
+		"wantsToCreate": "Roo vuole creare un nuovo file:",
+		"wantsToReadMultiple": "Roo vuole leggere questi {{count}} file:",
+		"didReadMultiple": "Roo ha letto questi {{count}} file:",
+		"wantsToWriteMultiple": "Roo vuole scrivere in questi {{count}} file:",
+		"didWriteMultiple": "Roo ha scritto in questi {{count}} file:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo vuole visualizzare i file di primo livello in questa directory:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo vuole visualizzare i nomi delle definizioni di codice sorgente utilizzate in questa directory:",
 		"didViewDefinitions": "Roo ha visualizzato i nomi delle definizioni di codice sorgente utilizzate in questa directory:",
 		"wantsToSearch": "Roo vuole cercare in questa directory <code>{{regex}}</code>:",
-		"didSearch": "Roo ha cercato in questa directory <code>{{regex}}</code>:"
+		"didSearch": "Roo ha cercato in questa directory <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo vuole visualizzare ricorsivamente tutti i file in queste {{count}} directory:",
+		"wantsToViewTopLevelMultiple": "Roo vuole visualizzare i file di primo livello in queste {{count}} directory:",
+		"didViewRecursiveMultiple": "Roo ha visualizzato ricorsivamente tutti i file in queste {{count}} directory:",
+		"didViewTopLevelMultiple": "Roo ha visualizzato i file di primo livello in queste {{count}} directory:",
+		"wantsToCreateMultiple": "Roo vuole creare queste {{count}} directory:",
+		"didCreateMultiple": "Roo ha creato queste {{count}} directory:",
+		"wantsToDeleteMultiple": "Roo vuole eliminare questi {{count}} elementi:",
+		"didDeleteMultiple": "Roo ha eliminato questi {{count}} elementi:",
+		"deleteWarning": "Attenzione: Questo eliminerà permanentemente gli elementi."
 	},
 	"commandOutput": "Output del comando",
 	"response": "Risposta",

@@ -116,7 +116,11 @@
 		"didRead": "Roo hat diese Datei gelesen:",
 		"wantsToEdit": "Roo möchte diese Datei bearbeiten:",
 		"wantsToEditOutsideWorkspace": "Roo möchte diese Datei außerhalb des Arbeitsbereichs bearbeiten:",
-		"wantsToCreate": "Roo möchte eine neue Datei erstellen:"
+		"wantsToCreate": "Roo möchte eine neue Datei erstellen:",
+		"wantsToReadMultiple": "Roo möchte diese {{count}} Dateien lesen:",
+		"didReadMultiple": "Roo hat diese {{count}} Dateien gelesen:",
+		"wantsToWriteMultiple": "Roo möchte in diese {{count}} Dateien schreiben:",
+		"didWriteMultiple": "Roo hat in diese {{count}} Dateien geschrieben:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo möchte die Dateien auf oberster Ebene in diesem Verzeichnis anzeigen:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo möchte Quellcode-Definitionsnamen in diesem Verzeichnis anzeigen:",
 		"didViewDefinitions": "Roo hat Quellcode-Definitionsnamen in diesem Verzeichnis angezeigt:",
 		"wantsToSearch": "Roo möchte dieses Verzeichnis nach <code>{{regex}}</code> durchsuchen:",
-		"didSearch": "Roo hat dieses Verzeichnis nach <code>{{regex}}</code> durchsucht:"
+		"didSearch": "Roo hat dieses Verzeichnis nach <code>{{regex}}</code> durchsucht:",
+		"wantsToViewRecursiveMultiple": "Roo möchte rekursiv alle Dateien in diesen {{count}} Verzeichnissen anzeigen:",
+		"wantsToViewTopLevelMultiple": "Roo möchte die Dateien auf oberster Ebene in diesen {{count}} Verzeichnissen anzeigen:",
+		"didViewRecursiveMultiple": "Roo hat rekursiv alle Dateien in diesen {{count}} Verzeichnissen angezeigt:",
+		"didViewTopLevelMultiple": "Roo hat die Dateien auf oberster Ebene in diesen {{count}} Verzeichnissen angezeigt:",
+		"wantsToCreateMultiple": "Roo möchte diese {{count}} Verzeichnisse erstellen:",
+		"didCreateMultiple": "Roo hat diese {{count}} Verzeichnisse erstellt:",
+		"wantsToDeleteMultiple": "Roo möchte diese {{count}} Elemente löschen:",
+		"didDeleteMultiple": "Roo hat diese {{count}} Elemente gelöscht:",
+		"deleteWarning": "Warnung: Dies löscht Elemente dauerhaft."
 	},
 	"commandOutput": "Befehlsausgabe",
 	"response": "Antwort",

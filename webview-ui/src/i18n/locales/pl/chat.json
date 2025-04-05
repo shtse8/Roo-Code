@@ -116,7 +116,11 @@
 		"didRead": "Roo przeczytał ten plik:",
 		"wantsToEdit": "Roo chce edytować ten plik:",
 		"wantsToEditOutsideWorkspace": "Roo chce edytować ten plik poza obszarem roboczym:",
-		"wantsToCreate": "Roo chce utworzyć nowy plik:"
+		"wantsToCreate": "Roo chce utworzyć nowy plik:",
+		"wantsToReadMultiple": "Roo chce przeczytać te {{count}} pliki:",
+		"didReadMultiple": "Roo przeczytał te {{count}} pliki:",
+		"wantsToWriteMultiple": "Roo chce zapisać do tych {{count}} plików:",
+		"didWriteMultiple": "Roo zapisał do tych {{count}} plików:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo chce zobaczyć pliki najwyższego poziomu w tym katalogu:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo chce zobaczyć nazwy definicji kodu źródłowego używane w tym katalogu:",
 		"didViewDefinitions": "Roo zobaczył nazwy definicji kodu źródłowego używane w tym katalogu:",
 		"wantsToSearch": "Roo chce przeszukać ten katalog w poszukiwaniu <code>{{regex}}</code>:",
-		"didSearch": "Roo przeszukał ten katalog w poszukiwaniu <code>{{regex}}</code>:"
+		"didSearch": "Roo przeszukał ten katalog w poszukiwaniu <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo chce rekurencyjnie zobaczyć wszystkie pliki w tych {{count}} katalogach:",
+		"wantsToViewTopLevelMultiple": "Roo chce zobaczyć pliki najwyższego poziomu w tych {{count}} katalogach:",
+		"didViewRecursiveMultiple": "Roo rekurencyjnie zobaczył wszystkie pliki w tych {{count}} katalogach:",
+		"didViewTopLevelMultiple": "Roo zobaczył pliki najwyższego poziomu w tych {{count}} katalogach:",
+		"wantsToCreateMultiple": "Roo chce utworzyć te {{count}} katalogi:",
+		"didCreateMultiple": "Roo utworzył te {{count}} katalogi:",
+		"wantsToDeleteMultiple": "Roo chce usunąć te {{count}} elementy:",
+		"didDeleteMultiple": "Roo usunął te {{count}} elementy:",
+		"deleteWarning": "Ostrzeżenie: Spowoduje to trwałe usunięcie elementów."
 	},
 	"commandOutput": "Wyjście polecenia",
 	"response": "Odpowiedź",

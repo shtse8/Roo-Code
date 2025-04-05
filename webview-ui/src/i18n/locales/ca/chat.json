@@ -116,7 +116,11 @@
 		"didRead": "Roo ha llegit aquest fitxer:",
 		"wantsToEdit": "Roo vol editar aquest fitxer:",
 		"wantsToEditOutsideWorkspace": "Roo vol editar aquest fitxer fora de l'espai de treball:",
-		"wantsToCreate": "Roo vol crear un nou fitxer:"
+		"wantsToCreate": "Roo vol crear un nou fitxer:",
+		"wantsToReadMultiple": "Roo vol llegir aquests {{count}} fitxers:",
+		"didReadMultiple": "Roo ha llegit aquests {{count}} fitxers:",
+		"wantsToWriteMultiple": "Roo vol escriure en aquests {{count}} fitxers:",
+		"didWriteMultiple": "Roo ha escrit en aquests {{count}} fitxers:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo vol veure els fitxers de nivell superior en aquest directori:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo vol veure noms de definicions de codi font utilitzats en aquest directori:",
 		"didViewDefinitions": "Roo ha vist noms de definicions de codi font utilitzats en aquest directori:",
 		"wantsToSearch": "Roo vol cercar en aquest directori <code>{{regex}}</code>:",
-		"didSearch": "Roo ha cercat en aquest directori <code>{{regex}}</code>:"
+		"didSearch": "Roo ha cercat en aquest directori <code>{{regex}}</code>:",
+		"wantsToViewRecursiveMultiple": "Roo vol veure recursivament tots els fitxers en aquests {{count}} directoris:",
+		"wantsToViewTopLevelMultiple": "Roo vol veure els fitxers de nivell superior en aquests {{count}} directoris:",
+		"didViewRecursiveMultiple": "Roo ha vist recursivament tots els fitxers en aquests {{count}} directoris:",
+		"didViewTopLevelMultiple": "Roo ha vist els fitxers de nivell superior en aquests {{count}} directoris:",
+		"wantsToCreateMultiple": "Roo vol crear aquests {{count}} directoris:",
+		"didCreateMultiple": "Roo ha creat aquests {{count}} directoris:",
+		"wantsToDeleteMultiple": "Roo vol eliminar aquests {{count}} elements:",
+		"didDeleteMultiple": "Roo ha eliminat aquests {{count}} elements:",
+		"deleteWarning": "Avís: Això eliminarà permanentment els elements."
 	},
 	"commandOutput": "Sortida de l'ordre",
 	"response": "Resposta",

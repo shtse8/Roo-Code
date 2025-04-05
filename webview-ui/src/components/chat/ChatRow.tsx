@@ -1,4 +1,4 @@
-import { VSCodeBadge, VSCodeButton, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react"
+import { VSCodeBadge, VSCodeButton, VSCodeProgressRing } from "@vscode/webview-ui-toolkit/react" // Try adding type imports
 import deepEqual from "fast-deep-equal"
 import React, { memo, useEffect, useMemo, useRef, useState } from "react"
 import { useSize } from "react-use"
@@ -14,7 +14,7 @@ import { COMMAND_OUTPUT_STRING } from "../../../../src/shared/combineCommandSequ
 import { useExtensionState } from "../../context/ExtensionStateContext"
 import { findMatchingResourceOrTemplate } from "../../utils/mcp"
 import { vscode } from "../../utils/vscode"
-import CodeAccordian, { removeLeadingNonAlphanumeric } from "../common/CodeAccordian"
+import CodeAccordian from "../common/CodeAccordian"
 import CodeBlock, { CODE_BLOCK_BG_COLOR } from "../common/CodeBlock"
 import MarkdownBlock from "../common/MarkdownBlock"
 import { ReasoningBlock } from "./ReasoningBlock"
@@ -244,9 +244,38 @@ export const ChatRowContent = ({
 		overflowWrap: "anywhere",
 	}
 
+	// Define a more robust type for parsed tool data, merging ClineSayTool and batch properties explicitly
+	// Making all properties optional initially, relying on runtime checks or specific tool cases
+	type ParsedToolData = {
+		tool?: string // Tool name
+		// Batch properties
+		paths?: { path: string; isOutsideWorkspace: boolean; status?: string }[]
+		// Single properties (can overlap with ClineSayTool)
+		path?: string
+		isOutsideWorkspace?: boolean
+		recursive?: boolean // Added recursive
+		// Other potential properties from various tools
+		content?: string
+		diff?: string
+		regex?: string
+		filePattern?: string
+		mode?: string // For switchMode/newTask
+		reason?: string // For readFiles, writeFiles etc.
+		// Properties from ClineSayTool that might not be covered above
+		progressStatus?: any // Use appropriate type if known
+	}
+
 	const tool = useMemo(() => {
+		// Check for both single 'tool' ask/say and potential new batch tool names in the message text structure
 		if (message.ask === "tool" || message.say === "tool") {
-			return JSON.parse(message.text || "{}") as ClineSayTool
+			try {
+				// The approval message content might contain a 'paths' array for batch tools
+				// or a single 'path' for older/single tools.
+				return JSON.parse(message.text || "{}") as ParsedToolData
+			} catch (e) {
+				console.error("Failed to parse tool message:", message.text, e)
+				return null
+			}
 		}
 		return null
 	}, [message.ask, message.say, message.text])
@@ -259,111 +288,151 @@ export const ChatRowContent = ({
 	}, [message.type, message.ask, message.partial, message.text])
 
 	if (tool) {
+		// Use the more specific type ParsedToolData
+		const toolData = tool as ParsedToolData
+		// Determine if it's a batch operation by checking the 'paths' array
+		const isBatch = Array.isArray(toolData.paths) && toolData.paths.length > 0
+		// Create a unified list of display paths
+		const displayPaths = isBatch
+			? toolData.paths!.map((p: { path: string }) => p.path) // Add type for p
+			: toolData.path
+				? [toolData.path]
+				: [] // Fallback to single path
+
 		const toolIcon = (name: string) => (
 			<span
 				className={`codicon codicon-${name}`}
 				style={{ color: "var(--vscode-foreground)", marginBottom: "-1.5px" }}></span>
 		)
 
-		switch (tool.tool) {
-			case "editedExistingFile":
-			case "appliedDiff":
+		// Helper to render path list for approval messages
+		const renderPathList = (paths: { path: string; isOutsideWorkspace: boolean; status?: string }[] | string[]) => (
+			<ul style={{ margin: "5px 0 10px 40px", padding: 0, listStyle: "disc" }}>
+				{paths.map((p, index) => {
+					const pathString = typeof p === "string" ? p : p.path
+					const isOutside = typeof p === "string" ? toolData.isOutsideWorkspace : p.isOutsideWorkspace
+					const status = typeof p === "string" ? undefined : p.status // For writeFiles status
+					return (
+						<li key={index} style={{ marginBottom: "2px", wordBreak: "break-all" }}>
+							<code>{pathString}</code>
+							{isOutside && (
+								<VSCodeBadge style={{ marginLeft: "5px", verticalAlign: "middle" }}>
+									Outside Workspace
+								</VSCodeBadge>
+							)}
+							{status && (
+								<VSCodeBadge style={{ marginLeft: "5px", verticalAlign: "middle" }}>
+									{status}
+								</VSCodeBadge>
+							)}
+						</li>
+					)
+				})}
+			</ul>
+		)
+
+		// Determine the effective tool name (batch or single)
+		const effectiveToolName = toolData.tool
+
+		switch (effectiveToolName) {
+			case "editedExistingFile": // Keep for single file edits
+			case "appliedDiff": // Keep for single file diffs
+				// These tools inherently operate on a single file's diff/content for display.
+				// The approval message might mention a single path.
 				return (
 					<>
 						<div style={headerStyle}>
-							{toolIcon(tool.tool === "appliedDiff" ? "diff" : "edit")}
+							{toolIcon(effectiveToolName === "appliedDiff" ? "diff" : "edit")}
 							<span style={{ fontWeight: "bold" }}>
-								{tool.isOutsideWorkspace
+								{toolData.isOutsideWorkspace // Check single path flag
 									? t("chat:fileOperations.wantsToEditOutsideWorkspace")
 									: t("chat:fileOperations.wantsToEdit")}
 							</span>
 						</div>
+						{/* Display single path for context */}
+						{displayPaths.length === 1 && renderPathList(displayPaths)}
+						{/* CodeAccordian still shows the diff/content for the single file */}
 						<CodeAccordian
 							progressStatus={message.progressStatus}
 							isLoading={message.partial}
-							diff={tool.diff!}
-							path={tool.path!}
+							diff={toolData.diff!}
+							path={toolData.path!} // Assumes single file path is present
 							isExpanded={isExpanded}
 							onToggleExpand={onToggleExpand}
 						/>
 					</>
 				)
-			case "newFileCreated":
+			case "newFileCreated": // Keep for single file creation
+				// This tool inherently operates on a single file's content for display.
 				return (
 					<>
 						<div style={headerStyle}>
 							{toolIcon("new-file")}
 							<span style={{ fontWeight: "bold" }}>{t("chat:fileOperations.wantsToCreate")}</span>
 						</div>
+						{/* Display single path for context */}
+						{displayPaths.length === 1 && renderPathList(displayPaths)}
+						{/* CodeAccordian shows the content for the single file */}
 						<CodeAccordian
 							isLoading={message.partial}
-							code={tool.content!}
-							path={tool.path!}
+							code={toolData.content!}
+							path={toolData.path!} // Assumes single file path is present
 							isExpanded={isExpanded}
 							onToggleExpand={onToggleExpand}
 						/>
 					</>
 				)
-			case "readFile":
+			case "readFile": // Handle single readFile
+			case "readFiles": // Handle batch readFiles
 				return (
 					<>
 						<div style={headerStyle}>
 							{toolIcon("file-code")}
 							<span style={{ fontWeight: "bold" }}>
 								{message.type === "ask"
-									? tool.isOutsideWorkspace
-										? t("chat:fileOperations.wantsToReadOutsideWorkspace")
-										: t("chat:fileOperations.wantsToRead")
-									: t("chat:fileOperations.didRead")}
+									? isBatch
+										? // TODO: Add new i18n key 'chat:fileOperations.wantsToReadMultiple'
+											t("chat:fileOperations.wantsToReadMultiple", { count: displayPaths.length })
+										: toolData.isOutsideWorkspace // Check single path flag
+											? t("chat:fileOperations.wantsToReadOutsideWorkspace")
+											: t("chat:fileOperations.wantsToRead")
+									: isBatch
+										? // TODO: Add new i18n key 'chat:fileOperations.didReadMultiple'
+											t("chat:fileOperations.didReadMultiple", { count: displayPaths.length })
+										: t("chat:fileOperations.didRead")}
 							</span>
 						</div>
-						{/* <CodeAccordian
-							code={tool.content!}
-							path={tool.path!}
-							isExpanded={isExpanded}
-							onToggleExpand={onToggleExpand}
-						/> */}
-						<div
-							style={{
-								borderRadius: 3,
-								backgroundColor: CODE_BLOCK_BG_COLOR,
-								overflow: "hidden",
-								border: "1px solid var(--vscode-editorGroup-border)",
-							}}>
-							<div
-								style={{
-									color: "var(--vscode-descriptionForeground)",
-									display: "flex",
-									alignItems: "center",
-									padding: "9px 10px",
-									cursor: "pointer",
-									userSelect: "none",
-									WebkitUserSelect: "none",
-									MozUserSelect: "none",
-									msUserSelect: "none",
-								}}
-								onClick={() => {
-									vscode.postMessage({ type: "openFile", text: tool.content })
-								}}>
-								{tool.path?.startsWith(".") && <span>.</span>}
-								<span
-									style={{
-										whiteSpace: "nowrap",
-										overflow: "hidden",
-										textOverflow: "ellipsis",
-										marginRight: "8px",
-										direction: "rtl",
-										textAlign: "left",
-									}}>
-									{removeLeadingNonAlphanumeric(tool.path ?? "") + "\u200E"}
-									{tool.reason}
-								</span>
-								<div style={{ flexGrow: 1 }}></div>
-								<span
-									className={`codicon codicon-link-external`}
-									style={{ fontSize: 13.5, margin: "1px 0" }}></span>
-							</div>
+						{/* Render path list for approval message */}
+						{message.type === "ask" && renderPathList(isBatch ? toolData.paths! : displayPaths)}
+						{/* Display reason/snippet if available */}
+						{message.type === "ask" && toolData.reason && (
+							<p style={{ ...pStyle, marginLeft: "26px", color: "var(--vscode-descriptionForeground)" }}>
+								({toolData.reason})
+							</p>
+						)}
+						{/* Result display (XML) is handled by AI, not shown directly in ChatRow */}
+					</>
+				)
+			case "writeFiles": // Handle batch writeFiles
+				return (
+					<>
+						<div style={headerStyle}>
+							{toolIcon("save-all")} {/* Use appropriate icon */}
+							<span style={{ fontWeight: "bold" }}>
+								{message.type === "ask"
+									? // TODO: Add new i18n key 'chat:fileOperations.wantsToWriteMultiple'
+										t("chat:fileOperations.wantsToWriteMultiple", { count: displayPaths.length })
+									: // TODO: Add new i18n key 'chat:fileOperations.didWriteMultiple'
+										t("chat:fileOperations.didWriteMultiple", { count: displayPaths.length })}
+							</span>
 						</div>
+						{message.type === "ask" && renderPathList(toolData.paths!)}
+						{message.type === "ask" && toolData.reason && (
+							<p style={{ ...pStyle, marginLeft: "26px", color: "var(--vscode-descriptionForeground)" }}>
+								({toolData.reason})
+							</p>
+						)}
+						{/* Result display (XML) is handled by AI */}
 					</>
 				)
 			case "fetchInstructions":
@@ -381,66 +450,76 @@ export const ChatRowContent = ({
 						/>
 					</>
 				)
-			case "listFilesTopLevel":
+			case "listFilesTopLevel": // Handle single listFilesTopLevel
+			case "listFilesRecursive": // Handle single listFilesRecursive
+			case "listDirectories": // Handle batch listDirectories
+				// Determine if recursive based on original tool name or batch param
+				const isRecursive = effectiveToolName === "listFilesRecursive" || toolData.recursive === true
 				return (
 					<>
 						<div style={headerStyle}>
 							{toolIcon("folder-opened")}
 							<span style={{ fontWeight: "bold" }}>
 								{message.type === "ask"
-									? t("chat:directoryOperations.wantsToViewTopLevel")
-									: t("chat:directoryOperations.didViewTopLevel")}
+									? isBatch
+										? isRecursive
+											? // TODO: Add new i18n key 'chat:directoryOperations.wantsToViewRecursiveMultiple'
+												t("chat:directoryOperations.wantsToViewRecursiveMultiple", {
+													count: displayPaths.length,
+												})
+											: // TODO: Add new i18n key 'chat:directoryOperations.wantsToViewTopLevelMultiple'
+												t("chat:directoryOperations.wantsToViewTopLevelMultiple", {
+													count: displayPaths.length,
+												})
+										: isRecursive
+											? t("chat:directoryOperations.wantsToViewRecursive")
+											: t("chat:directoryOperations.wantsToViewTopLevel")
+									: isBatch
+										? isRecursive
+											? // TODO: Add new i18n key 'chat:directoryOperations.didViewRecursiveMultiple'
+												t("chat:directoryOperations.didViewRecursiveMultiple", {
+													count: displayPaths.length,
+												})
+											: // TODO: Add new i18n key 'chat:directoryOperations.didViewTopLevelMultiple'
+												t("chat:directoryOperations.didViewTopLevelMultiple", {
+													count: displayPaths.length,
+												})
+										: isRecursive
+											? t("chat:directoryOperations.didViewRecursive")
+											: t("chat:directoryOperations.didViewTopLevel")}
 							</span>
 						</div>
-						<CodeAccordian
-							code={tool.content!}
-							path={tool.path!}
-							language="shell-session"
-							isExpanded={isExpanded}
-							onToggleExpand={onToggleExpand}
-						/>
+						{message.type === "ask" && renderPathList(isBatch ? toolData.paths! : displayPaths)}
+						{/* Result display (XML) is handled by AI */}
 					</>
 				)
-			case "listFilesRecursive":
+			// Removed listFilesRecursive case as it's merged with listFilesTopLevel/listDirectories
+			case "listCodeDefinitionNames": // Keep as is, likely operates on single path/dir
 				return (
 					<>
 						<div style={headerStyle}>
-							{toolIcon("folder-opened")}
-							<span style={{ fontWeight: "bold" }}>
-								{message.type === "ask"
-									? t("chat:directoryOperations.wantsToViewRecursive")
-									: t("chat:directoryOperations.didViewRecursive")}
-							</span>
-						</div>
-						<CodeAccordian
-							code={tool.content!}
-							path={tool.path!}
-							language="shell-session"
-							isExpanded={isExpanded}
-							onToggleExpand={onToggleExpand}
-						/>
-					</>
-				)
-			case "listCodeDefinitionNames":
-				return (
-					<>
-						<div style={headerStyle}>
-							{toolIcon("file-code")}
+							{toolIcon("symbol-struct")}
 							<span style={{ fontWeight: "bold" }}>
 								{message.type === "ask"
 									? t("chat:directoryOperations.wantsToViewDefinitions")
 									: t("chat:directoryOperations.didViewDefinitions")}
 							</span>
 						</div>
-						<CodeAccordian
-							code={tool.content!}
-							path={tool.path!}
-							isExpanded={isExpanded}
-							onToggleExpand={onToggleExpand}
-						/>
+						{/* Display single path for context */}
+						{displayPaths.length === 1 && renderPathList(displayPaths)}
+						{/* Result display (content) might be shown if needed, or handled by AI */}
+						{/* Example: Show result in CodeAccordian if present and not just for AI */}
+						{toolData.content && (
+							<CodeAccordian
+								code={toolData.content}
+								path={toolData.path!} // Assumes single path
+								isExpanded={isExpanded}
+								onToggleExpand={onToggleExpand}
+							/>
+						)}
 					</>
 				)
-			case "searchFiles":
+			case "searchFiles": // Keep as is, operates on single path/regex
 				return (
 					<>
 						<div style={headerStyle}>
@@ -449,25 +528,95 @@ export const ChatRowContent = ({
 								{message.type === "ask" ? (
 									<Trans
 										i18nKey="chat:directoryOperations.wantsToSearch"
-										components={{ code: <code>{tool.regex}</code> }}
-										values={{ regex: tool.regex }}
+										components={{ code: <code>{toolData.regex}</code> }}
+										values={{ regex: toolData.regex }}
 									/>
 								) : (
 									<Trans
 										i18nKey="chat:directoryOperations.didSearch"
-										components={{ code: <code>{tool.regex}</code> }}
-										values={{ regex: tool.regex }}
+										components={{ code: <code>{toolData.regex}</code> }}
+										values={{ regex: toolData.regex }}
 									/>
 								)}
 							</span>
 						</div>
-						<CodeAccordian
-							code={tool.content!}
-							path={tool.path! + (tool.filePattern ? `/(${tool.filePattern})` : "")}
-							language="plaintext"
-							isExpanded={isExpanded}
-							onToggleExpand={onToggleExpand}
-						/>
+						{/* Display single path for context */}
+						{displayPaths.length === 1 && renderPathList(displayPaths)}
+						{/* Result display (content) might be shown if needed, or handled by AI */}
+						{toolData.content && (
+							<CodeAccordian
+								code={toolData.content}
+								path={toolData.path! + (toolData.filePattern ? `/(${toolData.filePattern})` : "")}
+								language="plaintext"
+								isExpanded={isExpanded}
+								onToggleExpand={onToggleExpand}
+							/>
+						)}
+					</>
+				)
+			// Add cases for new batch tools
+			case "createDirectories":
+				return (
+					<>
+						<div style={headerStyle}>
+							{toolIcon("new-folder")}
+							<span style={{ fontWeight: "bold" }}>
+								{message.type === "ask"
+									? // TODO: Add new i18n key 'chat:directoryOperations.wantsToCreateMultiple'
+										t("chat:directoryOperations.wantsToCreateMultiple", {
+											count: displayPaths.length,
+										})
+									: // TODO: Add new i18n key 'chat:directoryOperations.didCreateMultiple'
+										t("chat:directoryOperations.didCreateMultiple", { count: displayPaths.length })}
+							</span>
+						</div>
+						{message.type === "ask" && renderPathList(toolData.paths!)}
+						{message.type === "ask" && toolData.reason && (
+							<p style={{ ...pStyle, marginLeft: "26px", color: "var(--vscode-descriptionForeground)" }}>
+								({toolData.reason})
+							</p>
+						)}
+						{/* Result display (XML) is handled by AI */}
+					</>
+				)
+			case "deleteItems":
+				return (
+					<>
+						<div style={headerStyle}>
+							{toolIcon("trash")}
+							<span style={{ fontWeight: "bold" }}>
+								{message.type === "ask"
+									? // TODO: Add new i18n key 'chat:directoryOperations.wantsToDeleteMultiple'
+										t("chat:directoryOperations.wantsToDeleteMultiple", {
+											count: displayPaths.length,
+										})
+									: // TODO: Add new i18n key 'chat:directoryOperations.didDeleteMultiple'
+										t("chat:directoryOperations.didDeleteMultiple", { count: displayPaths.length })}
+							</span>
+						</div>
+						{message.type === "ask" && renderPathList(toolData.paths!)}
+						{/* Add strong warning for deletion */}
+						{message.type === "ask" && (
+							<p
+								style={{
+									...pStyle,
+									marginLeft: "26px",
+									color: "var(--vscode-errorForeground)",
+									fontWeight: "bold",
+								}}>
+								{/* TODO: Add new i18n key 'chat:directoryOperations.deleteWarning' */}
+								{t(
+									"chat:directoryOperations.deleteWarning",
+									"Warning: This will permanently delete items.",
+								)}
+							</p>
+						)}
+						{message.type === "ask" && toolData.reason && (
+							<p style={{ ...pStyle, marginLeft: "26px", color: "var(--vscode-descriptionForeground)" }}>
+								({toolData.reason})
+							</p>
+						)}
+						{/* Result display (XML) is handled by AI */}
 					</>
 				)
 			case "switchMode":
@@ -698,7 +847,8 @@ export const ChatRowContent = ({
 										marginRight: "-6px",
 									}}
 									disabled={isStreaming}
-									onClick={(e) => {
+									onClick={(e: React.MouseEvent) => {
+										// Add type for e
 										e.stopPropagation()
 										vscode.postMessage({
 											type: "deleteMessage",

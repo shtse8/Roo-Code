@@ -116,7 +116,11 @@
 		"didRead": "Roo가 이 파일을 읽었습니다:",
 		"wantsToEdit": "Roo가 이 파일을 편집하고 싶어합니다:",
 		"wantsToEditOutsideWorkspace": "Roo가 워크스페이스 외부의 이 파일을 편집하고 싶어합니다:",
-		"wantsToCreate": "Roo가 새 파일을 만들고 싶어합니다:"
+		"wantsToCreate": "Roo가 새 파일을 만들고 싶어합니다:",
+		"wantsToReadMultiple": "Roo가 이 {{count}}개의 파일을 읽고 싶어합니다:",
+		"didReadMultiple": "Roo가 이 {{count}}개의 파일을 읽었습니다:",
+		"wantsToWriteMultiple": "Roo가 이 {{count}}개의 파일에 쓰고 싶어합니다:",
+		"didWriteMultiple": "Roo가 이 {{count}}개의 파일에 썼습니다:"
 	},
 	"directoryOperations": {
 		"wantsToViewTopLevel": "Roo가 이 디렉토리의 최상위 파일을 보고 싶어합니다:",
@@ -126,7 +130,16 @@
 		"wantsToViewDefinitions": "Roo가 이 디렉토리에서 사용된 소스 코드 정의 이름을 보고 싶어합니다:",
 		"didViewDefinitions": "Roo가 이 디렉토리에서 사용된 소스 코드 정의 이름을 보았습니다:",
 		"wantsToSearch": "Roo가 이 디렉토리에서 <code>{{regex}}</code>을(를) 검색하고 싶어합니다:",
-		"didSearch": "Roo가 이 디렉토리에서 <code>{{regex}}</code>을(를) 검색했습니다:"
+		"didSearch": "Roo가 이 디렉토리에서 <code>{{regex}}</code>을(를) 검색했습니다:",
+		"wantsToViewRecursiveMultiple": "Roo가 이 {{count}}개의 디렉토리의 모든 파일을 재귀적으로 보고 싶어합니다:",
+		"wantsToViewTopLevelMultiple": "Roo가 이 {{count}}개의 디렉토리의 최상위 파일을 보고 싶어합니다:",
+		"didViewRecursiveMultiple": "Roo가 이 {{count}}개의 디렉토리의 모든 파일을 재귀적으로 보았습니다:",
+		"didViewTopLevelMultiple": "Roo가 이 {{count}}개의 디렉토리의 최상위 파일을 보았습니다:",
+		"wantsToCreateMultiple": "Roo가 이 {{count}}개의 디렉토리를 만들고 싶어합니다:",
+		"didCreateMultiple": "Roo가 이 {{count}}개의 디렉토리를 만들었습니다:",
+		"wantsToDeleteMultiple": "Roo가 이 {{count}}개의 항목을 삭제하고 싶어합니다:",
+		"didDeleteMultiple": "Roo가 이 {{count}}개의 항목을 삭제했습니다:",
+		"deleteWarning": "경고: 항목이 영구적으로 삭제됩니다."
 	},
 	"commandOutput": "명령 출력",
 	"response": "응답",
