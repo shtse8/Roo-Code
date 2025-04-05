@@ -421,7 +421,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 			setTextAreaDisabled(true)
 			setClineAsk(undefined)
 			setEnableButtons(false)
-			disableAutoScrollRef.current = false
+			// disableAutoScrollRef.current = false
 		},
 		[clineAsk, startNewTask],
 	)
@@ -468,7 +468,7 @@ const ChatView = ({ isHidden, showAnnouncement, hideAnnouncement, showHistoryVie
 			setTextAreaDisabled(true)
 			setClineAsk(undefined)
 			setEnableButtons(false)
-			disableAutoScrollRef.current = false
+			// disableAutoScrollRef.current = false
 		},
 		[clineAsk, startNewTask, isStreaming],
 	)
