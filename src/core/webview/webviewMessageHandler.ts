@@ -42,6 +42,134 @@ import { getDiffStrategy } from "../diff/DiffStrategy"
 import { SYSTEM_PROMPT } from "../prompts/system"
 import { buildApiHandler } from "../../api"
 
+// Define the list of placeholders
+// Define the list of placeholders grouped by section
+// Define the list of placeholders grouped by section, now with descriptions
+const promptPlaceholdersGrouped = {
+	General: [
+		{
+			name: "{{ROLE_DEFINITION}}",
+			description: "The primary role and personality definition for the current mode.",
+		},
+		{
+			name: "{{SHARED_TOOL_USE_SECTION}}",
+			description: "General instructions on how tools should be used (XML format).",
+		},
+		{
+			name: "{{TOOL_DESCRIPTIONS}}",
+			description: "Detailed descriptions and usage examples for all tools available in the current mode.",
+		},
+		{
+			name: "{{TOOL_USE_GUIDELINES}}",
+			description: "Step-by-step guidelines for iterative tool use and handling results.",
+		},
+		{
+			name: "{{MCP_SERVERS_SECTION}}",
+			description: "Information about connected MCP servers and their available tools/resources.",
+		},
+		{
+			name: "{{CAPABILITIES_SECTION}}",
+			description: "Overview of the AI's capabilities, including file access, command execution, etc.",
+		},
+		{ name: "{{MODES_SECTION}}", description: "Description of available modes and how to switch between them." },
+		{
+			name: "{{OBJECTIVE_SECTION}}",
+			description: "The overall objective and process the AI should follow to complete tasks.",
+		},
+	],
+	"System Info": [
+		{ name: "{{SYSTEM_INFO_SECTION}}", description: "The complete System Information section." },
+		{ name: "{{SYSTEM_INFO_OS}}", description: "The user's operating system name." },
+		{ name: "{{SYSTEM_INFO_SHELL}}", description: "The user's default shell path." },
+		{ name: "{{SYSTEM_INFO_HOME_DIR}}", description: "The user's home directory path." },
+		{ name: "{{SYSTEM_INFO_CWD}}", description: "The current working directory for the project." },
+		{
+			name: "{{SYSTEM_INFO_ENV_DETAILS_EXPLANATION}}",
+			description: "Explanation of the environment_details provided automatically.",
+		},
+	],
+	Rules: [
+		{ name: "{{RULES_SECTION}}", description: "The complete Rules section." },
+		{ name: "{{RULES_BASE_DIR}}", description: "Rule: Project base directory." },
+		{ name: "{{RULES_RELATIVE_PATHS}}", description: "Rule: Use relative paths." },
+		{ name: "{{RULES_NO_CD}}", description: "Rule: Do not use 'cd' command." },
+		{ name: "{{RULES_NO_HOME_CHAR}}", description: "Rule: Do not use '~' or '$HOME'." },
+		{
+			name: "{{RULES_EXECUTE_COMMAND_CONTEXT}}",
+			description: "Rule: Check system info before using execute_command.",
+		},
+		{ name: "{{RULES_SEARCH_FILES_USAGE}}", description: "Rule: Guidelines for using search_files." },
+		{ name: "{{RULES_NEW_PROJECT_STRUCTURE}}", description: "Rule: How to structure new projects." },
+		{ name: "{{RULES_EDITING_TOOLS_AVAILABLE}}", description: "Rule: List of available file editing tools." },
+		{
+			name: "{{RULES_EDITING_INSERT_CONTENT_DETAIL}}",
+			description: "Rule: Detailed usage for insert_content tool (if enabled).",
+		},
+		{
+			name: "{{RULES_EDITING_SEARCH_REPLACE_DETAIL}}",
+			description: "Rule: Detailed usage for search_and_replace tool (if enabled).",
+		},
+		{
+			name: "{{RULES_EDITING_PREFER_OTHER_TOOLS}}",
+			description: "Rule: Prefer other tools over write_to_file for edits.",
+		},
+		{
+			name: "{{RULES_EDITING_WRITE_TO_FILE_DETAIL}}",
+			description: "Rule: Detailed usage and warnings for write_to_file.",
+		},
+		{ name: "{{RULES_MODE_RESTRICTIONS}}", description: "Rule: Mode-specific file editing restrictions." },
+		{ name: "{{RULES_PROJECT_CONTEXT}}", description: "Rule: Consider project type and context." },
+		{ name: "{{RULES_CODE_CHANGE_CONTEXT}}", description: "Rule: Consider code context when making changes." },
+		{ name: "{{RULES_MINIMIZE_QUESTIONS}}", description: "Rule: Do not ask unnecessary questions." },
+		{ name: "{{RULES_ASK_FOLLOWUP_USAGE}}", description: "Rule: How and when to use ask_followup_question." },
+		{ name: "{{RULES_EXECUTE_COMMAND_OUTPUT}}", description: "Rule: How to handle missing command output." },
+		{ name: "{{RULES_USER_PROVIDED_CONTENT}}", description: "Rule: Handling file content provided by the user." },
+		{ name: "{{RULES_GOAL_ORIENTED}}", description: "Rule: Focus on the task, not conversation." },
+		{
+			name: "{{RULES_BROWSER_ACTION_USAGE}}",
+			description: "Rule: When to use browser_action for generic tasks (if enabled).",
+		},
+		{
+			name: "{{RULES_NO_CONVERSATIONAL_ENDINGS}}",
+			description: "Rule: Formatting for attempt_completion results.",
+		},
+		{ name: "{{RULES_NO_CONVERSATIONAL_STARTERS}}", description: "Rule: Avoid conversational openings." },
+		{ name: "{{RULES_IMAGE_USAGE}}", description: "Rule: Utilize vision capabilities for images." },
+		{ name: "{{RULES_ENV_DETAILS_USAGE}}", description: "Rule: How to interpret environment_details." },
+		{ name: "{{RULES_ACTIVE_TERMINALS}}", description: "Rule: Check active terminals before executing commands." },
+		{ name: "{{RULES_MCP_OPERATIONS}}", description: "Rule: Handle MCP operations sequentially." },
+		{
+			name: "{{RULES_WAIT_FOR_CONFIRMATION}}",
+			description: "Rule: Wait for user confirmation after each tool use.",
+		},
+	],
+	"Custom Instructions": [
+		{ name: "{{CUSTOM_INSTRUCTIONS_SECTION}}", description: "The complete User's Custom Instructions section." },
+		{
+			name: "{{CUSTOM_INSTRUCTIONS_LANGUAGE_PREFERENCE}}",
+			description: "The user's preferred language instruction.",
+		},
+		{ name: "{{CUSTOM_INSTRUCTIONS_GLOBAL}}", description: "Global custom instructions provided by the user." },
+		{
+			name: "{{CUSTOM_INSTRUCTIONS_MODE_SPECIFIC}}",
+			description: "Mode-specific custom instructions from the mode definition.",
+		},
+		{
+			name: "{{CUSTOM_INSTRUCTIONS_RULES_MODE_SPECIFIC}}",
+			description: "Rules loaded from the mode-specific .clinerules-<mode> file.",
+		},
+		{
+			name: "{{CUSTOM_INSTRUCTIONS_RULES_GENERIC}}",
+			description: "Rules loaded from generic files like .clinerules, .cursorrules.",
+		},
+		{ name: "{{CUSTOM_INSTRUCTIONS_RULES_ROOIGNORE}}", description: "Rules loaded from the .rooignore file." },
+		{
+			name: "{{CUSTOM_INSTRUCTIONS_RULES_ALL}}",
+			description: "All combined rules from mode-specific, generic, and .rooignore files.",
+		},
+	],
+}
+
 export const webviewMessageHandler = async (provider: ClineProvider, message: WebviewMessage) => {
 	switch (message.type) {
 		case "webviewDidLaunch":
@@ -238,6 +366,9 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			})
 
 			provider.isViewLaunched = true
+
+			// Don't send placeholders immediately anymore
+
 			break
 		case "newTask":
 			// Code that should run in response to the hello message command
@@ -1327,6 +1458,11 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			await provider.postStateToWebview()
 			break
 		}
+		case "requestPromptPlaceholders": // Handle request from UI
+			provider.log("[MessageHandler] Received requestPromptPlaceholders from webview.")
+			provider.postMessageToWebview({ type: "promptPlaceholders", placeholders: promptPlaceholdersGrouped }) // Send grouped list
+			provider.log("[MessageHandler] Sent promptPlaceholders to webview.")
+			break
 	}
 }
 

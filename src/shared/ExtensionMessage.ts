@@ -69,6 +69,7 @@ export interface ExtensionMessage {
 		| "maxReadFileLine"
 		| "fileSearchResults"
 		| "toggleApiConfigPin"
+		| "promptPlaceholders" // Added new type
 	text?: string
 	action?:
 		| "chatButtonClicked"
@@ -111,6 +112,7 @@ export interface ExtensionMessage {
 		label?: string
 	}>
 	error?: string
+	placeholders?: Record<string, { name: string; description: string }[]> // Update type for name/description objects
 }
 
 export type ExtensionState = Pick<

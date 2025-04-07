@@ -267,13 +267,14 @@ export async function getFullModeDetails(
 	// If we have cwd, load and combine all custom instructions
 	let fullCustomInstructions = baseCustomInstructions
 	if (options?.cwd) {
-		fullCustomInstructions = await addCustomInstructions(
+		const instructionsResult = await addCustomInstructions(
 			baseCustomInstructions,
 			options.globalCustomInstructions || "",
 			options.cwd,
 			modeSlug,
 			{ language: options.language },
 		)
+		fullCustomInstructions = instructionsResult.fullSection
 	}
 
 	// Return mode with any overrides applied

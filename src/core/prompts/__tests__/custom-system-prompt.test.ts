@@ -112,21 +112,22 @@ describe("File-Based Custom System Prompt", () => {
 			true, // enableMcpServerCreation
 		)
 
-		// Should contain role definition and file-based system prompt
-		expect(prompt).toContain(modes[0].roleDefinition)
-		expect(prompt).toContain(fileCustomSystemPrompt)
+		// Should be exactly the file content, as no placeholders were used
+		expect(prompt).toBe(fileCustomSystemPrompt)
 
-		// Should not contain any of the default sections
+		// Should not contain the default role definition or other sections automatically
+		expect(prompt).not.toContain(modes[0].roleDefinition)
 		expect(prompt).not.toContain("CAPABILITIES")
 		expect(prompt).not.toContain("MODES")
+		expect(prompt).not.toContain("USER'S CUSTOM INSTRUCTIONS") // Custom instructions also need placeholder
 	})
 
 	it("should combine file-based system prompt with role definition and custom instructions", async () => {
-		// Mock the readFile to return content from a file
-		const fileCustomSystemPrompt = "Custom system prompt from file"
+		// Mock the readFile to return content with a placeholder
+		const fileCustomSystemPromptWithPlaceholder = "Role: {{ROLE_DEFINITION}}. Rest of prompt."
 		mockedFs.readFile.mockImplementation((filePath, options) => {
 			if (toPosix(filePath).includes(`.roo/system-prompt-${defaultModeSlug}`) && options === "utf-8") {
-				return Promise.resolve(fileCustomSystemPrompt)
+				return Promise.resolve(fileCustomSystemPromptWithPlaceholder)
 			}
 			return Promise.reject({ code: "ENOENT" })
 		})
@@ -155,12 +156,15 @@ describe("File-Based Custom System Prompt", () => {
 			true, // enableMcpServerCreation
 		)
 
-		// Should contain custom role definition and file-based system prompt
-		expect(prompt).toContain(customRoleDefinition)
-		expect(prompt).toContain(fileCustomSystemPrompt)
+		// Should contain the substituted role definition and the rest of the file content
+		expect(prompt).toContain(`Role: ${customRoleDefinition}.`)
+		expect(prompt).toContain("Rest of prompt.")
+		// Ensure the original placeholder is gone
+		expect(prompt).not.toContain("{{ROLE_DEFINITION}}")
 
-		// Should not contain any of the default sections
+		// Should not contain other default sections unless placeholders exist in the file
 		expect(prompt).not.toContain("CAPABILITIES")
 		expect(prompt).not.toContain("MODES")
+		expect(prompt).not.toContain("USER'S CUSTOM INSTRUCTIONS")
 	})
 })

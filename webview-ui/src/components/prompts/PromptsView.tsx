@@ -72,6 +72,9 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 	const [isCreateModeDialogOpen, setIsCreateModeDialogOpen] = useState(false)
 	const [activeSupportTab, setActiveSupportTab] = useState<SupportPromptType>("ENHANCE")
 	const [isSystemPromptDisclosureOpen, setIsSystemPromptDisclosureOpen] = useState(false)
+	const [availablePlaceholders, setAvailablePlaceholders] = useState<
+		Record<string, { name: string; description: string }[]>
+	>({}) // Update state type
 
 	// Direct update functions
 	const updateAgentPrompt = useCallback(
@@ -343,8 +346,35 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 		}
 
 		window.addEventListener("message", handler)
-		return () => window.removeEventListener("message", handler)
+
+		// Add listener for placeholders
+		const placeholderHandler = (event: MessageEvent) => {
+			const message = event.data // The JSON data our extension sent
+			if (message.type === "promptPlaceholders") {
+				setAvailablePlaceholders(message.placeholders || {}) // Expect object now
+			}
+		}
+		window.addEventListener("message", placeholderHandler)
+
+		return () => {
+			window.removeEventListener("message", handler)
+			window.removeEventListener("message", placeholderHandler) // Cleanup placeholder listener
+		}
 	}, [])
+
+	// Request placeholders when component mounts
+	useEffect(() => {
+		console.log("[PromptsView] Requesting placeholders...") // Add log
+		vscode.postMessage({ type: "requestPromptPlaceholders" })
+	}, [])
+
+	// Add effect to log when placeholders are received
+	useEffect(() => {
+		if (Object.keys(availablePlaceholders).length > 0) {
+			// Check if object has keys
+			console.log("[PromptsView] Received placeholders:", availablePlaceholders)
+		}
+	}, [availablePlaceholders])
 
 	const updateSupportPrompt = (type: SupportPromptType, value: string | undefined) => {
 		vscode.postMessage({
@@ -618,10 +648,10 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 								<div className="font-bold">{t("prompts:tools.title")}</div>
 								{findModeBySlug(mode, customModes) && (
 									<Button
-											variant="ghost"
-											size="icon"
-											onClick={() => setIsToolsEditMode(!isToolsEditMode)}
-											title={
+										variant="ghost"
+										size="icon"
+										onClick={() => setIsToolsEditMode(!isToolsEditMode)}
+										title={
 											isToolsEditMode
 												? t("prompts:tools.doneEditing")
 												: t("prompts:tools.editTools")
@@ -809,6 +839,64 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 									),
 								}}
 							/>
+						</div>
+					</div>
+
+					{/* Display Available Placeholders */}
+					<div className="mt-4">
+						<h4 className="font-bold mb-2">{t("prompts:placeholders.title")}</h4>
+						<div className="text-xs text-vscode-descriptionForeground mb-3">
+							{t("prompts:placeholders.description")}
+						</div>
+						<div className="space-y-2">
+							{Object.entries(availablePlaceholders).map(([groupName, placeholders]) => (
+								<details key={groupName} className="group">
+									<summary className="cursor-pointer list-none flex items-center text-xs font-medium text-vscode-foreground hover:text-vscode-textLink-foreground">
+										<span className="codicon codicon-chevron-right group-open:codicon-chevron-down mr-1"></span>
+										{groupName} ({placeholders.length})
+									</summary>
+									<div className="pl-5 pt-2 space-y-1.5">
+										{" "}
+										{/* Use space-y for vertical separation */}
+										{/* Separate Full Section Placeholder */}
+										{placeholders
+											.filter((ph) => ph.name.endsWith("_SECTION}}"))
+											.map((ph) => (
+												<div key={ph.name} className="flex items-center mb-1">
+													<button
+														onClick={() => navigator.clipboard.writeText(ph.name)}
+														title={ph.description}
+														className="px-1.5 py-0.5 bg-[var(--vscode-input-background)] text-[var(--vscode-foreground)] border border-[var(--vscode-input-border)] rounded text-xs cursor-pointer hover:bg-[var(--vscode-list-hoverBackground)] transition-colors">
+														<code>{ph.name}</code>
+													</button>
+													<span className="ml-1.5 text-xs text-vscode-descriptionForeground">
+														({t("prompts:placeholders.fullSection")})
+													</span>
+												</div>
+											))}
+										{/* Divider if both types exist */}
+										{placeholders.some((ph) => ph.name.endsWith("_SECTION}}")) &&
+											placeholders.some((ph) => !ph.name.endsWith("_SECTION}}")) && (
+												<hr className="border-vscode-editorWidget-border my-1" />
+											)}
+										{/* Granular Placeholders */}
+										<div className="flex flex-wrap gap-1.5">
+											{placeholders
+												.filter((ph) => !ph.name.endsWith("_SECTION}}")) // Filter out full section
+												.map((ph) => (
+													// Reverted to simple tag style
+													<button
+														key={ph.name}
+														onClick={() => navigator.clipboard.writeText(ph.name)}
+														title={ph.description}
+														className="px-1.5 py-0.5 bg-[var(--vscode-input-background)] text-[var(--vscode-foreground)] border border-[var(--vscode-input-border)] rounded text-xs cursor-pointer hover:bg-[var(--vscode-list-hoverBackground)] transition-colors">
+														<code>{ph.name}</code>
+													</button>
+												))}
+										</div>
+									</div>
+								</details>
+							))}
 						</div>
 					</div>
 				</div>

@@ -30,66 +30,78 @@ export async function loadRuleFiles(cwd: string): Promise<string> {
 	return combinedRules
 }
 
+export interface CustomInstructionsComponents {
+	languagePreference: string
+	globalInstructions: string
+	modeSpecificInstructions: string
+	rulesModeSpecific: string
+	rulesGeneric: string
+	rulesRooIgnore: string
+	rulesAll: string
+	fullSection: string
+}
+
 export async function addCustomInstructions(
 	modeCustomInstructions: string,
 	globalCustomInstructions: string,
 	cwd: string,
 	mode: string,
 	options: { language?: string; rooIgnoreInstructions?: string } = {},
-): Promise<string> {
-	const sections = []
+): Promise<CustomInstructionsComponents> {
+	const sections: string[] = []
+	const rules: string[] = []
 
-	// Load mode-specific rules if mode is provided
-	let modeRuleContent = ""
+	// --- Prepare Individual Components ---
+
+	// Language Preference
+	const languagePreference = options.language
+		? `Language Preference:\nYou should always speak and think in the "${
+				isLanguage(options.language) ? LANGUAGES[options.language] : options.language
+			}" (${options.language}) language unless the user gives you instructions below to do otherwise.`
+		: ""
+	if (languagePreference) sections.push(languagePreference)
+
+	// Global Instructions
+	const globalInstructions =
+		typeof globalCustomInstructions === "string" && globalCustomInstructions.trim()
+			? `Global Instructions:\n${globalCustomInstructions.trim()}`
+			: ""
+	if (globalInstructions) sections.push(globalInstructions)
+
+	// Mode-Specific Instructions
+	const modeSpecificInstructions =
+		typeof modeCustomInstructions === "string" && modeCustomInstructions.trim()
+			? `Mode-specific Instructions:\n${modeCustomInstructions.trim()}`
+			: ""
+	if (modeSpecificInstructions) sections.push(modeSpecificInstructions)
+
+	// Mode-Specific Rules
+	let rulesModeSpecific = ""
 	if (mode) {
 		const modeRuleFile = `.clinerules-${mode}`
-		modeRuleContent = await safeReadFile(path.join(cwd, modeRuleFile))
+		const modeRuleContent = await safeReadFile(path.join(cwd, modeRuleFile))
+		if (modeRuleContent && modeRuleContent.trim()) {
+			rulesModeSpecific = `# Rules from ${modeRuleFile}:\n${modeRuleContent}`
+			rules.push(rulesModeSpecific)
+		}
 	}
 
-	// Add language preference if provided
-	if (options.language) {
-		const languageName = isLanguage(options.language) ? LANGUAGES[options.language] : options.language
-		sections.push(
-			`Language Preference:\nYou should always speak and think in the "${languageName}" (${options.language}) language unless the user gives you instructions below to do otherwise.`,
-		)
-	}
+	// RooIgnore Rules
+	const rulesRooIgnore = options.rooIgnoreInstructions || ""
+	if (rulesRooIgnore) rules.push(rulesRooIgnore)
 
-	// Add global instructions first
-	if (typeof globalCustomInstructions === "string" && globalCustomInstructions.trim()) {
-		sections.push(`Global Instructions:\n${globalCustomInstructions.trim()}`)
-	}
-
-	// Add mode-specific instructions after
-	if (typeof modeCustomInstructions === "string" && modeCustomInstructions.trim()) {
-		sections.push(`Mode-specific Instructions:\n${modeCustomInstructions.trim()}`)
-	}
-
-	// Add rules - include both mode-specific and generic rules if they exist
-	const rules = []
-
-	// Add mode-specific rules first if they exist
-	if (modeRuleContent && modeRuleContent.trim()) {
-		const modeRuleFile = `.clinerules-${mode}`
-		rules.push(`# Rules from ${modeRuleFile}:\n${modeRuleContent}`)
-	}
-
-	if (options.rooIgnoreInstructions) {
-		rules.push(options.rooIgnoreInstructions)
-	}
-
-	// Add generic rules
+	// Generic Rules
 	const genericRuleContent = await loadRuleFiles(cwd)
-	if (genericRuleContent && genericRuleContent.trim()) {
-		rules.push(genericRuleContent.trim())
-	}
+	const rulesGeneric = genericRuleContent && genericRuleContent.trim() ? genericRuleContent.trim() : ""
+	if (rulesGeneric) rules.push(rulesGeneric)
 
-	if (rules.length > 0) {
-		sections.push(`Rules:\n\n${rules.join("\n\n")}`)
-	}
+	// Combined Rules Section
+	const rulesAll = rules.length > 0 ? `Rules:\n\n${rules.join("\n\n")}` : ""
+	if (rulesAll) sections.push(rulesAll)
 
+	// --- Prepare Full Section ---
 	const joinedSections = sections.join("\n\n")
-
-	return joinedSections
+	const fullSection = joinedSections
 		? `
 ====
 
@@ -99,4 +111,15 @@ The following additional instructions are provided by the user, and should be fo
 
 ${joinedSections}`
 		: ""
+
+	return {
+		languagePreference,
+		globalInstructions,
+		modeSpecificInstructions,
+		rulesModeSpecific,
+		rulesGeneric,
+		rulesRooIgnore,
+		rulesAll,
+		fullSection,
+	}
 }

@@ -12,8 +12,8 @@ describe("addCustomInstructions", () => {
 			{ language: "fr" },
 		)
 
-		expect(result).toContain("Language Preference:")
-		expect(result).toContain('You should always speak and think in the "Français" (fr) language')
+		expect(result.fullSection).toContain("Language Preference:")
+		expect(result.fullSection).toContain('You should always speak and think in the "Français" (fr) language')
 	})
 
 	test("works without vscode language", async () => {

@@ -25,7 +25,14 @@ jest.mock("../sections/custom-instructions", () => {
 	}
 })
 
+// Mock loadSystemPromptFile
+jest.mock("../sections/custom-system-prompt", () => ({
+	loadSystemPromptFile: jest.fn().mockResolvedValue(null), // Default to null (no file found)
+}))
+
 // Set up default mock implementation
+import { CustomInstructionsComponents } from "../sections/custom-instructions" // Import the interface
+
 const { __setMockImplementation } = jest.requireMock("../sections/custom-instructions")
 __setMockImplementation(
 	async (
@@ -33,42 +40,61 @@ __setMockImplementation(
 		globalCustomInstructions: string,
 		cwd: string,
 		mode: string,
-		options?: { language?: string },
-	) => {
-		const sections = []
+		options?: { language?: string; rooIgnoreInstructions?: string },
+	): Promise<CustomInstructionsComponents> => {
+		const sections: string[] = []
+		const rules: string[] = []
 
-		// Add language preference if provided
-		if (options?.language) {
-			sections.push(
-				`Language Preference:\nYou should always speak and think in the "${options.language}" language.`,
-			)
-		}
+		// Language Preference
+		const languagePreference = options?.language
+			? `Language Preference:\nYou should always speak and think in the "${options.language}" language.`
+			: ""
+		if (languagePreference) sections.push(languagePreference)
 
-		// Add global instructions first
-		if (globalCustomInstructions?.trim()) {
-			sections.push(`Global Instructions:\n${globalCustomInstructions.trim()}`)
-		}
+		// Global Instructions
+		const globalInstructions = globalCustomInstructions?.trim()
+			? `Global Instructions:\n${globalCustomInstructions.trim()}`
+			: ""
+		if (globalInstructions) sections.push(globalInstructions)
 
-		// Add mode-specific instructions after
-		if (modeCustomInstructions?.trim()) {
-			sections.push(`Mode-specific Instructions:\n${modeCustomInstructions}`)
-		}
+		// Mode-Specific Instructions
+		const modeSpecificInstructions = modeCustomInstructions?.trim()
+			? `Mode-specific Instructions:\n${modeCustomInstructions}`
+			: ""
+		if (modeSpecificInstructions) sections.push(modeSpecificInstructions)
 
-		// Add rules
-		const rules = []
-		if (mode) {
-			rules.push(`# Rules from .clinerules-${mode}:\nMock mode-specific rules`)
-		}
-		rules.push(`# Rules from .clinerules:\nMock generic rules`)
+		// Mode-Specific Rules
+		const rulesModeSpecific = mode ? `# Rules from .clinerules-${mode}:\nMock mode-specific rules` : ""
+		if (rulesModeSpecific) rules.push(rulesModeSpecific)
 
-		if (rules.length > 0) {
-			sections.push(`Rules:\n${rules.join("\n")}`)
-		}
+		// RooIgnore Rules
+		const rulesRooIgnore = options?.rooIgnoreInstructions || ""
+		if (rulesRooIgnore) rules.push(rulesRooIgnore)
 
+		// Generic Rules
+		const rulesGeneric = `# Rules from .clinerules:\nMock generic rules` // Simplified for mock
+		rules.push(rulesGeneric)
+
+		// Combined Rules Section
+		const rulesAll = rules.length > 0 ? `Rules:\n\n${rules.join("\n\n")}` : ""
+		if (rulesAll) sections.push(rulesAll)
+
+		// Full Section
 		const joinedSections = sections.join("\n\n")
-		return joinedSections
+		const fullSection = joinedSections
 			? `\n====\n\nUSER'S CUSTOM INSTRUCTIONS\n\nThe following additional instructions are provided by the user, and should be followed to the best of your ability without interfering with the TOOL USE guidelines.\n\n${joinedSections}`
 			: ""
+
+		return {
+			languagePreference,
+			globalInstructions,
+			modeSpecificInstructions,
+			rulesModeSpecific,
+			rulesGeneric,
+			rulesRooIgnore,
+			rulesAll,
+			fullSection,
+		}
 	},
 )
 
@@ -478,6 +504,66 @@ describe("SYSTEM_PROMPT", () => {
 		expect(prompt.indexOf(modes[0].roleDefinition)).toBeLessThan(prompt.indexOf("TOOL USE"))
 	})
 
+	it("should substitute placeholders in file-based custom system prompts", async () => {
+		// Mock loadSystemPromptFile to return a template
+		const mockLoadSystemPromptFile = jest.requireMock("../sections/custom-system-prompt").loadSystemPromptFile
+		const filePromptTemplate = `Custom Role: {{ROLE_DEFINITION}}
+
+This is my custom prompt file.
+
+Tools Available:
+{{TOOL_DESCRIPTIONS}}
+
+Guidelines:
+{{TOOL_USE_GUIDELINES}}
+
+My Instructions:
+{{CUSTOM_INSTRUCTIONS_SECTION}}
+
+System Info: {{SYSTEM_INFO_SECTION}}
+Objective: {{OBJECTIVE_SECTION}}
+Unknown Placeholder: {{UNKNOWN_PLACEHOLDER}}`
+		mockLoadSystemPromptFile.mockResolvedValue(filePromptTemplate)
+
+		const prompt = await SYSTEM_PROMPT(
+			mockContext,
+			"/test/path",
+			true, // supportsComputerUse
+			undefined, // mcpHub
+			new MultiSearchReplaceDiffStrategy(), // diffStrategy
+			"1024x768", // browserViewportSize
+			"code", // mode
+			undefined, // customModePrompts
+			undefined, // customModes
+			"Global custom instructions for file prompt test", // globalCustomInstructions
+			true, // diffEnabled
+			undefined, // experiments
+			false, // enableMcpServerCreation
+			"fr", // language
+			"Mock rooignore instructions", // rooIgnoreInstructions
+		)
+
+		// Check that known placeholders are replaced
+		expect(prompt).toContain("Custom Role: You are Roo") // Assuming 'code' mode role def starts like this
+		expect(prompt).toContain("Tools Available:")
+		expect(prompt).toContain("## read_file") // Check if tool descriptions are inserted
+		expect(prompt).toContain("Guidelines:")
+		expect(prompt).toContain("1. In <thinking> tags") // Check if guidelines are inserted
+		expect(prompt).toContain("My Instructions:")
+		expect(prompt).toContain("Global custom instructions for file prompt test") // Check custom instructions
+		expect(prompt).toContain("System Info: ====") // Check system info section start
+		expect(prompt).toContain("Objective: ====") // Check objective section start
+
+		// Check that unknown placeholders remain untouched
+		expect(prompt).toContain("Unknown Placeholder: {{UNKNOWN_PLACEHOLDER}}")
+
+		// Snapshot the result
+		expect(prompt).toMatchSnapshot()
+
+		// Reset mock for other tests
+		mockLoadSystemPromptFile.mockResolvedValue(null)
+	})
+
 	describe("experimental tools", () => {
 		it("should disable experimental tools by default", async () => {
 			// Set experiments to explicitly disable experimental tools
@@ -758,102 +844,110 @@ describe("addCustomInstructions", () => {
 	})
 
 	it("should prioritize mode-specific rules for code mode", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
+		// Snapshot the entire result object
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should prioritize mode-specific rules for ask mode", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", modes[2].slug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", modes[2].slug)
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should prioritize mode-specific rules for architect mode", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", modes[1].slug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", modes[1].slug)
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should prioritize mode-specific rules for test engineer mode", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", "test")
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", "test")
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should prioritize mode-specific rules for code reviewer mode", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", "review")
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", "review")
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should fall back to generic rules when mode-specific rules not found", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
+		// Snapshot the entire result object
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should include preferred language when provided", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", defaultModeSlug, {
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", defaultModeSlug, {
 			language: "es",
 		})
-		expect(instructions).toMatchSnapshot()
+		expect(instructionsResult).toMatchSnapshot() // Snapshot the object
 	})
 
 	it("should include custom instructions when provided", async () => {
-		const instructions = await addCustomInstructions("Custom test instructions", "", "/test/path", defaultModeSlug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions(
+			"Custom test instructions",
+			"",
+			"/test/path",
+			defaultModeSlug,
+		)
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should combine all custom instructions", async () => {
-		const instructions = await addCustomInstructions(
+		const instructionsResult = await addCustomInstructions(
 			"Custom test instructions",
 			"",
 			"/test/path",
 			defaultModeSlug,
 			{ language: "fr" },
 		)
-		expect(instructions).toMatchSnapshot()
+		expect(instructionsResult).toMatchSnapshot() // Snapshot the object
 	})
 
 	it("should handle undefined mode-specific instructions", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should trim mode-specific instructions", async () => {
-		const instructions = await addCustomInstructions(
+		const instructionsResult = await addCustomInstructions(
 			"  Custom mode instructions  ",
 			"",
 			"/test/path",
 			defaultModeSlug,
 		)
-		expect(instructions).toMatchSnapshot()
+		expect(instructionsResult).toMatchSnapshot() // Snapshot the object
 	})
 
 	it("should handle empty mode-specific instructions", async () => {
-		const instructions = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
-		expect(instructions).toMatchSnapshot()
+		const instructionsResult = await addCustomInstructions("", "", "/test/path", defaultModeSlug)
+		expect(instructionsResult).toMatchSnapshot()
 	})
 
 	it("should combine global and mode-specific instructions", async () => {
-		const instructions = await addCustomInstructions(
+		const instructionsResult = await addCustomInstructions(
 			"Mode-specific instructions",
 			"Global instructions",
 			"/test/path",
 			defaultModeSlug,
 		)
-		expect(instructions).toMatchSnapshot()
+		expect(instructionsResult).toMatchSnapshot() // Snapshot the object
 	})
 
 	it("should prioritize mode-specific instructions after global ones", async () => {
-		const instructions = await addCustomInstructions(
+		const instructionsResult = await addCustomInstructions(
 			"Second instruction",
 			"First instruction",
 			"/test/path",
 			defaultModeSlug,
 		)
+		const instructions = instructionsResult.fullSection // Get the full string for splitting
 
 		const instructionParts = instructions.split("\n\n")
 		const globalIndex = instructionParts.findIndex((part) => part.includes("First instruction"))
 		const modeSpecificIndex = instructionParts.findIndex((part) => part.includes("Second instruction"))
 
 		expect(globalIndex).toBeLessThan(modeSpecificIndex)
-		expect(instructions).toMatchSnapshot()
+		expect(instructionsResult).toMatchSnapshot() // Snapshot the object
 	})
 
 	afterAll(() => {

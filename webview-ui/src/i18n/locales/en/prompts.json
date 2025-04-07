@@ -143,5 +143,11 @@
 		},
 		"deleteMode": "Delete mode"
 	},
-	"allFiles": "all files"
+	"allFiles": "all files",
+	"placeholders": {
+		"title": "Available Placeholders",
+		"description": "Click a placeholder to copy it to your clipboard. Use these in the 'Custom Instructions' or '.roo/system-prompt-...' files to insert dynamic content.",
+		"copy": "Copy {{placeholder}} to clipboard",
+		"fullSection": "Full Section"
+	}
 }

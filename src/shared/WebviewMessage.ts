@@ -121,6 +121,8 @@ export interface WebviewMessage {
 		| "maxReadFileLine"
 		| "searchFiles"
 		| "toggleApiConfigPin"
+		| "promptPlaceholders" // Added new type
+		| "requestPromptPlaceholders" // Added request type
 	text?: string
 	disabled?: boolean
 	askResponse?: ClineAskResponse
@@ -146,6 +148,7 @@ export interface WebviewMessage {
 	source?: "global" | "project"
 	requestId?: string
 	ids?: string[]
+	placeholders?: string[] // Added property for the list
 }
 
 export const checkoutDiffPayloadSchema = z.object({

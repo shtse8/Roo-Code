@@ -116,19 +116,19 @@ describe("addCustomInstructions", () => {
 			{ language: "es" },
 		)
 
-		expect(result).toContain("Language Preference:")
-		expect(result).toContain("Español") // Check for language name
-		expect(result).toContain("(es)") // Check for language code in parentheses
-		expect(result).toContain("Global Instructions:\nglobal instructions")
-		expect(result).toContain("Mode-specific Instructions:\nmode instructions")
-		expect(result).toContain("Rules from .clinerules-test-mode:\nmode specific rules")
+		expect(result.fullSection).toContain("Language Preference:")
+		expect(result.fullSection).toContain("Español") // Check for language name
+		expect(result.fullSection).toContain("(es)") // Check for language code in parentheses
+		expect(result.fullSection).toContain("Global Instructions:\nglobal instructions")
+		expect(result.fullSection).toContain("Mode-specific Instructions:\nmode instructions")
+		expect(result.fullSection).toContain("Rules from .clinerules-test-mode:\nmode specific rules")
 	})
 
 	it("should return empty string when no instructions provided", async () => {
 		mockedFs.readFile.mockRejectedValue({ code: "ENOENT" })
 
 		const result = await addCustomInstructions("", "", "/fake/path", "", {})
-		expect(result).toBe("")
+		expect(result.fullSection).toBe("") // Check the fullSection property
 	})
 
 	it("should handle missing mode-specific rules file", async () => {
@@ -141,9 +141,9 @@ describe("addCustomInstructions", () => {
 			"test-mode",
 		)
 
-		expect(result).toContain("Global Instructions:")
-		expect(result).toContain("Mode-specific Instructions:")
-		expect(result).not.toContain("Rules from .clinerules-test-mode")
+		expect(result.fullSection).toContain("Global Instructions:")
+		expect(result.fullSection).toContain("Mode-specific Instructions:")
+		expect(result.fullSection).not.toContain("Rules from .clinerules-test-mode")
 	})
 
 	it("should handle unknown language codes properly", async () => {
@@ -157,9 +157,9 @@ describe("addCustomInstructions", () => {
 			{ language: "xyz" }, // Unknown language code
 		)
 
-		expect(result).toContain("Language Preference:")
-		expect(result).toContain('"xyz" (xyz) language') // For unknown codes, the code is used as the name too
-		expect(result).toContain("Global Instructions:\nglobal instructions")
+		expect(result.fullSection).toContain("Language Preference:")
+		expect(result.fullSection).toContain('"xyz" (xyz) language') // For unknown codes, the code is used as the name too
+		expect(result.fullSection).toContain("Global Instructions:\nglobal instructions")
 	})
 
 	it("should throw on unexpected errors", async () => {
@@ -187,8 +187,8 @@ describe("addCustomInstructions", () => {
 			"test-mode",
 		)
 
-		expect(result).toContain("Global Instructions:\nglobal instructions")
-		expect(result).toContain("Mode-specific Instructions:\nmode instructions")
-		expect(result).not.toContain("Rules from .clinerules-test-mode")
+		expect(result.fullSection).toContain("Global Instructions:\nglobal instructions")
+		expect(result.fullSection).toContain("Mode-specific Instructions:\nmode instructions")
+		expect(result.fullSection).not.toContain("Rules from .clinerules-test-mode")
 	})
 })
