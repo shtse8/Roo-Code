@@ -229,7 +229,7 @@ export const SYSTEM_PROMPT = async (
 			// Add requested placeholders
 			"{{MODE_SLUG}}": currentMode.slug,
 			"{{LANGUAGE}}": language ?? formatLanguage(vscode.env.language),
-			// Removed "{{CWD}}": cwd, use "{{SYSTEM_INFO_CWD}}" instead
+			"{{CWD_PATH}}": cwd, // Add placeholder for just the path
 		}
 
 		// Perform substitutions using reduce for better maintainability
