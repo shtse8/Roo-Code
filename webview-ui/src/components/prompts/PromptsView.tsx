@@ -889,7 +889,8 @@ const PromptsView = ({ onDone }: PromptsViewProps) => {
 														key={ph.name}
 														onClick={() => navigator.clipboard.writeText(ph.name)}
 														title={ph.description}
-														className="px-1.5 py-0.5 bg-[var(--vscode-input-background)] text-[var(--vscode-foreground)] border border-[var(--vscode-input-border)] rounded text-xs cursor-pointer hover:bg-[var(--vscode-list-hoverBackground)] transition-colors">
+														className="px-1.5 py-0.5 bg-[var(--vscode-input-background)] text-[var(--vscode-foreground)] border border-[var(--vscode-input-border)] rounded text-xs cursor-pointer hover:bg-[var(--vscode-list-hoverBackground)] transition-colors" // Reverted style
+													>
 														<code>{ph.name}</code>
 													</button>
 												))}

@@ -227,9 +227,9 @@ export const SYSTEM_PROMPT = async (
 			"{{CUSTOM_INSTRUCTIONS_RULES_ROOIGNORE}}": customInstructions.rulesRooIgnore,
 			"{{CUSTOM_INSTRUCTIONS_RULES_ALL}}": customInstructions.rulesAll,
 			// Add requested placeholders
-			"{{CWD}}": cwd,
 			"{{MODE_SLUG}}": currentMode.slug,
 			"{{LANGUAGE}}": language ?? formatLanguage(vscode.env.language),
+			// Removed "{{CWD}}": cwd, use "{{SYSTEM_INFO_CWD}}" instead
 		}
 
 		// Perform substitutions using reduce for better maintainability

@@ -87,6 +87,8 @@ const promptPlaceholdersGrouped = {
 			name: "{{SYSTEM_INFO_ENV_DETAILS_EXPLANATION}}",
 			description: "Explanation of the environment_details provided automatically.",
 		},
+		{ name: "{{MODE_SLUG}}", description: "The slug (ID) of the currently active mode." },
+		{ name: "{{LANGUAGE}}", description: "The current language code (e.g., 'en', 'zh-CN')." },
 	],
 	Rules: [
 		{ name: "{{RULES_SECTION}}", description: "The complete Rules section." },
